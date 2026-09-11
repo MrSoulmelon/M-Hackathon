@@ -1,0 +1,9 @@
+medicine_id,name,unit,criticality_tier
+MED-001,Amoxicillin 500mg,capsules,essential
+MED-002,Paracetamol 500mg,tablets,routine
+MED-003,Insulin Regular 100IU/ml,vials,essential
+MED-004,Oral Rehydration Salts (ORS),sachets,essential
+MED-005,Artemether/Lumefantrine 20/120mg,tablets,essential
+MED-006,Salbutamol Inhaler 100mcg,inhalers,routine
+MED-007,Ciprofloxacin 500mg,tablets,routine
+MED-008,Ibuprofen 400mg,tablets,routine
