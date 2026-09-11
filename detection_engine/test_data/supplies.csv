@@ -1,0 +1,4 @@
+medicine_id,name,unit,criticality_tier
+MED-001,Paracetamol 500mg,tablets,2
+MED-002,Amoxicillin 250mg,capsules,1
+MED-003,ORS Sachets,sachets,3

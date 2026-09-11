@@ -1,0 +1,7 @@
+facility_id,name,district,lat,lon,type,catchment_population,supplier_id,neighbors
+FAC-001,City General Hospital,District-North,28.6139,77.209,hospital,50000,SUP-001,"[""FAC-002"", ""FAC-003""]"
+FAC-002,Northside Clinic,District-North,28.63,77.22,clinic,20000,SUP-001,"[""FAC-001"", ""FAC-003""]"
+FAC-003,Central Health Centre,District-North,28.645,77.235,hospital,45000,SUP-002,"[""FAC-001"", ""FAC-002""]"
+FAC-004,Southgate Clinic,District-South,28.52,77.19,clinic,30000,SUP-002,"[""FAC-005"", ""FAC-006""]"
+FAC-005,District South Hospital,District-South,28.5,77.17,hospital,55000,SUP-002,"[""FAC-004"", ""FAC-006""]"
+FAC-006,Riverside Clinic,District-South,28.51,77.21,clinic,25000,SUP-001,"[""FAC-004"", ""FAC-005""]"
