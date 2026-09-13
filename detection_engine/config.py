@@ -41,8 +41,14 @@ DELAY_CORRELATION_WINDOW_DAYS = 5   # Delays within 5 days of each other → cor
 MIN_FACILITIES_FOR_SYSTEMIC = 2     # Need at least 2 facilities to call it systemic
 
 # ─── Recommendation Engine ──────────────────────────────────────────────
-# Criticality tier weights (tier 1 = most critical, e.g. antibiotics)
-CRITICALITY_WEIGHTS = {1: 3.0, 2: 2.0, 3: 1.0}
+# Criticality tier weights (tier 1 or 'essential' = most critical)
+CRITICALITY_WEIGHTS = {
+    "essential": 3.0, 
+    "routine": 1.0, 
+    1: 3.0, 
+    2: 2.0, 
+    3: 1.0
+}
 
 TRAVEL_SPEED_KMH = 40              # Assumed road speed for travel-time estimates
 NEIGHBOR_SURPLUS_DOS_MIN = 20      # Donor must have ≥20 days of supply to donate

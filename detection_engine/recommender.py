@@ -59,7 +59,7 @@ def _travel_time_minutes(
 
 
 def _priority_score(
-    criticality_tier: int,
+    criticality_tier: int | str,
     days_of_supply: float,
     catchment_population: int,
 ) -> float:
@@ -67,7 +67,7 @@ def _priority_score(
     Higher score = more urgent.
     priority = criticality × urgency × population_weight
     """
-    crit = CRITICALITY_WEIGHTS.get(int(criticality_tier), 1.0)
+    crit = CRITICALITY_WEIGHTS.get(criticality_tier, 1.0)
     urgency = min(20.0, max(1.0, 10.0 / max(days_of_supply, 0.5)))
     pop = math.log2(catchment_population / 1000 + 1) if catchment_population > 0 else 1.0
     return round(crit * urgency * pop, 2)
@@ -123,7 +123,7 @@ def generate_recommendations(
         if fac is None or supply is None:
             continue
 
-        criticality = int(supply.get("criticality_tier", 2))
+        criticality = supply.get("criticality_tier", 2)
         catchment = int(fac.get("catchment_population", 1000))
         priority = _priority_score(criticality, rs["days_of_supply"], catchment)
 
