@@ -22,35 +22,35 @@ export const mockFacilities: Facility[] = [
 ];
 
 export const mockMedicines: Medicine[] = [
-  { medicine_id: 'MED-01', name: 'Amoxicillin 500mg Oral', category: 'essential' },
-  { medicine_id: 'MED-02', name: 'Artemether-Lumefantrine (ACT)', category: 'essential' },
-  { medicine_id: 'MED-03', name: 'Oxytocin 10 IU/ml Injection', category: 'essential' },
-  { medicine_id: 'MED-04', name: 'Metformin 500mg Tab', category: 'routine' },
-  { medicine_id: 'MED-05', name: 'Gentamicin 80mg/2ml', category: 'essential' },
-  { medicine_id: 'MED-06', name: 'Salbutamol Inhaler 100mcg', category: 'routine' },
-  { medicine_id: 'MED-07', name: 'Paracetamol 500mg Tab', category: 'routine' },
-  { medicine_id: 'MED-08', name: 'Ceftriaxone 1g Powder', category: 'essential' },
+  { medicine_id: 'MED-001', name: 'Amoxicillin 500mg Oral', category: 'essential' },
+  { medicine_id: 'MED-002', name: 'Artemether-Lumefantrine (ACT)', category: 'essential' },
+  { medicine_id: 'MED-003', name: 'Oxytocin 10 IU/ml Injection', category: 'essential' },
+  { medicine_id: 'MED-004', name: 'Metformin 500mg Tab', category: 'routine' },
+  { medicine_id: 'MED-005', name: 'Gentamicin 80mg/2ml', category: 'essential' },
+  { medicine_id: 'MED-006', name: 'Salbutamol Inhaler 100mcg', category: 'routine' },
+  { medicine_id: 'MED-007', name: 'Paracetamol 500mg Tab', category: 'routine' },
+  { medicine_id: 'MED-008', name: 'Ceftriaxone 1g Powder', category: 'essential' },
 ];
 
 // Explicit risk scores for the systemic + isolated scenarios
 const explicitRiskScores: RiskScore[] = [
   // FAC-001 (St. Jude — systemic victim of SUP-ALPHA-01 delay)
   {
-    facility_id: 'FAC-001', medicine_id: 'MED-01', medicine_name: 'Amoxicillin 500mg Oral',
+    facility_id: 'FAC-001', medicine_id: 'MED-001', medicine_name: 'Amoxicillin 500mg Oral',
     risk_level: 'red', days_of_supply: 4, projected_stockout_date: 'Sep 17', confidence: 'high',
     confidence_note: 'Complete sensor telemetry & inventory scans over 90 days',
     signals: { consumption_trend: 'rising', consumption_anomaly_score: 0.88, replenishment_status: 'overdue', replenishment_delay_days: 9 },
     reason_codes: ['SUPPLIER_OVERDUE_9D', 'BURN_RATE_SPIKE_40PCT', 'BUFFER_BELOW_THRESHOLD'],
   },
   {
-    facility_id: 'FAC-001', medicine_id: 'MED-02', medicine_name: 'Artemether-Lumefantrine (ACT)',
+    facility_id: 'FAC-001', medicine_id: 'MED-002', medicine_name: 'Artemether-Lumefantrine (ACT)',
     risk_level: 'amber', days_of_supply: 9, projected_stockout_date: 'Sep 22', confidence: 'medium',
     confidence_note: 'Partial weekly counts; seasonal trend factored',
     signals: { consumption_trend: 'rising', consumption_anomaly_score: 0.62, replenishment_status: 'delayed', replenishment_delay_days: 4 },
     reason_codes: ['SEASONAL_MALARIA_UPTICK', 'SUPPLIER_DELAY_4D'],
   },
   {
-    facility_id: 'FAC-001', medicine_id: 'MED-03', medicine_name: 'Oxytocin 10 IU/ml Injection',
+    facility_id: 'FAC-001', medicine_id: 'MED-003', medicine_name: 'Oxytocin 10 IU/ml Injection',
     risk_level: 'green', days_of_supply: 38, projected_stockout_date: 'Oct 29', confidence: 'high',
     confidence_note: 'Cold-chain tracked; steady baseline',
     signals: { consumption_trend: 'stable', consumption_anomaly_score: 0.12, replenishment_status: 'on_time', replenishment_delay_days: 0 },
@@ -59,7 +59,7 @@ const explicitRiskScores: RiskScore[] = [
 
   // FAC-002 (Metro North — also under SUP-ALPHA-01)
   {
-    facility_id: 'FAC-002', medicine_id: 'MED-01', medicine_name: 'Amoxicillin 500mg Oral',
+    facility_id: 'FAC-002', medicine_id: 'MED-001', medicine_name: 'Amoxicillin 500mg Oral',
     risk_level: 'red', days_of_supply: 3, projected_stockout_date: 'Sep 16', confidence: 'high',
     confidence_note: 'Verified daily dispensing counts',
     signals: { consumption_trend: 'stable', consumption_anomaly_score: 0.79, replenishment_status: 'overdue', replenishment_delay_days: 8 },
@@ -68,7 +68,7 @@ const explicitRiskScores: RiskScore[] = [
 
   // FAC-003 (Kibera Clinic — also under SUP-ALPHA-01)
   {
-    facility_id: 'FAC-003', medicine_id: 'MED-01', medicine_name: 'Amoxicillin 500mg Oral',
+    facility_id: 'FAC-003', medicine_id: 'MED-001', medicine_name: 'Amoxicillin 500mg Oral',
     risk_level: 'amber', days_of_supply: 8, projected_stockout_date: 'Sep 21', confidence: 'medium',
     confidence_note: 'High variance in daily walk-in demand',
     signals: { consumption_trend: 'rising', consumption_anomaly_score: 0.68, replenishment_status: 'delayed', replenishment_delay_days: 5 },
@@ -77,7 +77,7 @@ const explicitRiskScores: RiskScore[] = [
 
   // FAC-013 (Coast Provincial — also under SUP-ALPHA-01, red on Amoxicillin)
   {
-    facility_id: 'FAC-013', medicine_id: 'MED-01', medicine_name: 'Amoxicillin 500mg Oral',
+    facility_id: 'FAC-013', medicine_id: 'MED-001', medicine_name: 'Amoxicillin 500mg Oral',
     risk_level: 'red', days_of_supply: 5, projected_stockout_date: 'Sep 18', confidence: 'high',
     confidence_note: 'Hospital ERP feed synchronized',
     signals: { consumption_trend: 'rising', consumption_anomaly_score: 0.81, replenishment_status: 'overdue', replenishment_delay_days: 9 },
@@ -86,7 +86,7 @@ const explicitRiskScores: RiskScore[] = [
 
   // FAC-009 (Eastern Valley Hub — isolated local spike on Ceftriaxone under SUP-DELTA-04)
   {
-    facility_id: 'FAC-009', medicine_id: 'MED-08', medicine_name: 'Ceftriaxone 1g Powder',
+    facility_id: 'FAC-009', medicine_id: 'MED-008', medicine_name: 'Ceftriaxone 1g Powder',
     risk_level: 'amber', days_of_supply: 7, projected_stockout_date: 'Sep 20', confidence: 'low',
     confidence_note: 'Limited reporting data due to telecom maintenance',
     signals: { consumption_trend: 'rising', consumption_anomaly_score: 0.74, replenishment_status: 'on_time', replenishment_delay_days: 0 },
@@ -138,7 +138,7 @@ export const mockAlerts: Alert[] = [
     scope: 'systemic',
     district: 'Central Metro & Coastal',
     supplier_id: 'SUP-ALPHA-01',
-    medicine_id: 'MED-01',
+    medicine_id: 'MED-001',
     medicine_name: 'Amoxicillin 500mg Oral',
     affected_facilities: ['FAC-001', 'FAC-002', 'FAC-003', 'FAC-013', 'FAC-014'],
     pct_facilities_amber_or_red: 80,
@@ -151,7 +151,7 @@ export const mockAlerts: Alert[] = [
     scope: 'local',
     district: 'Eastern Valley',
     supplier_id: 'SUP-DELTA-04',
-    medicine_id: 'MED-08',
+    medicine_id: 'MED-008',
     medicine_name: 'Ceftriaxone 1g Powder',
     affected_facilities: ['FAC-009'],
     pct_facilities_amber_or_red: 25,
@@ -165,7 +165,7 @@ export const mockRecommendations: Recommendation[] = [
   {
     recommendation_id: 'REC-01',
     type: 'redistribution',
-    medicine_id: 'MED-01',
+    medicine_id: 'MED-001',
     medicine_name: 'Amoxicillin 500mg',
     from_facility_id: 'FAC-005',
     to_facility_id: 'FAC-002',
@@ -178,7 +178,7 @@ export const mockRecommendations: Recommendation[] = [
   {
     recommendation_id: 'REC-02',
     type: 'expedite',
-    medicine_id: 'MED-01',
+    medicine_id: 'MED-001',
     medicine_name: 'Amoxicillin 500mg',
     to_facility_id: 'FAC-001',
     priority_score: 91,
@@ -188,7 +188,7 @@ export const mockRecommendations: Recommendation[] = [
   {
     recommendation_id: 'REC-03',
     type: 'redistribution',
-    medicine_id: 'MED-01',
+    medicine_id: 'MED-001',
     medicine_name: 'Amoxicillin 500mg',
     from_facility_id: 'FAC-004',
     to_facility_id: 'FAC-003',
@@ -201,7 +201,7 @@ export const mockRecommendations: Recommendation[] = [
   {
     recommendation_id: 'REC-04',
     type: 'escalate',
-    medicine_id: 'MED-01',
+    medicine_id: 'MED-001',
     medicine_name: 'Amoxicillin (Regional Pool)',
     to_facility_id: 'FAC-013',
     priority_score: 79,
@@ -211,7 +211,7 @@ export const mockRecommendations: Recommendation[] = [
   {
     recommendation_id: 'REC-05',
     type: 'expedite',
-    medicine_id: 'MED-08',
+    medicine_id: 'MED-008',
     medicine_name: 'Ceftriaxone 1g',
     to_facility_id: 'FAC-009',
     priority_score: 72,

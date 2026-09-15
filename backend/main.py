@@ -14,9 +14,11 @@ import json
 import os
 import sqlite3
 from typing import List, Optional
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from auth import auth_router, get_current_user
+from datetime import datetime
 
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "shortage_system.db")
 
@@ -25,6 +27,8 @@ app = FastAPI(
     description="Backend data API providing facility metadata, supplies catalog, inventory snapshots, consumption events, and replenishment orders.",
     version="1.0.0",
 )
+
+app.include_router(auth_router)
 
 # Enable CORS for all origins
 app.add_middleware(
@@ -296,6 +300,159 @@ def get_replenishment(
         }
         for r in rows
     ]
+
+class ManualUpdate(BaseModel):
+    medicine_id: str
+    new_quantity: int
+    note: str
+
+class ShipmentUpdate(BaseModel):
+    status: str
+    expected_date: str
+
+@app.get("/my-facility", tags=["Consumer"])
+def get_my_facility(user: dict = Depends(get_current_user)):
+    if user["role"] != "consumer":
+        from fastapi import HTTPException
+        raise HTTPException(status_code=403, detail="Not authorized as consumer")
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM facilities WHERE facility_id = ?", (user["reference_id"],))
+    fac = cursor.fetchone()
+    conn.close()
+    
+    if fac:
+        fac_dict = dict(fac)
+        fac_dict["neighbors"] = json.loads(fac_dict["neighbors"]) if isinstance(fac_dict["neighbors"], str) else fac_dict["neighbors"]
+        return fac_dict
+    return None
+
+@app.post("/inventory/manual-update", tags=["Consumer"])
+def manual_update_inventory(update: ManualUpdate, user: dict = Depends(get_current_user)):
+    if user["role"] != "consumer":
+        from fastapi import HTTPException
+        raise HTTPException(status_code=403, detail="Not authorized as consumer")
+    
+    facility_id = user["reference_id"]
+    today = datetime.now().strftime("%Y-%m-%d")
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Get current quantity
+    cursor.execute("SELECT quantity_on_hand FROM inventory WHERE facility_id = ? AND medicine_id = ? AND date = ?", 
+                   (facility_id, update.medicine_id, today))
+    row = cursor.fetchone()
+    old_qty = row["quantity_on_hand"] if row else 0
+    
+    # Update or insert into inventory
+    if row:
+        cursor.execute("UPDATE inventory SET quantity_on_hand = ? WHERE facility_id = ? AND medicine_id = ? AND date = ?",
+                       (update.new_quantity, facility_id, update.medicine_id, today))
+    else:
+        cursor.execute("INSERT INTO inventory (facility_id, medicine_id, date, quantity_on_hand) VALUES (?, ?, ?, ?)",
+                       (facility_id, update.medicine_id, today, update.new_quantity))
+                       
+    # Record in stock_updates
+    cursor.execute("""
+        INSERT INTO stock_updates (facility_id, medicine_id, user_id, role, old_qty, new_qty, note, source, timestamp)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (facility_id, update.medicine_id, user["id"], user["role"], old_qty, update.new_quantity, update.note, "Facility-Reported", datetime.now().isoformat()))
+    
+    conn.commit()
+    conn.close()
+    return {"status": "success"}
+
+@app.get("/my-shipments", tags=["Supplier"])
+def get_my_shipments(user: dict = Depends(get_current_user)):
+    if user["role"] != "supplier":
+        from fastapi import HTTPException
+        raise HTTPException(status_code=403, detail="Not authorized as supplier")
+        
+    supplier_id = user["reference_id"]
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Get all facilities for this supplier
+    cursor.execute("SELECT facility_id FROM facilities WHERE supplier_id = ?", (supplier_id,))
+    facilities = [r["facility_id"] for r in cursor.fetchall()]
+    
+    if not facilities:
+        conn.close()
+        return []
+        
+    placeholders = ",".join("?" * len(facilities))
+    cursor.execute(f"SELECT * FROM replenishment WHERE facility_id IN ({placeholders}) ORDER BY order_date DESC", facilities)
+    shipments = [dict(r) for r in cursor.fetchall()]
+    conn.close()
+    
+    return shipments
+
+@app.post("/replenishment/{replenishment_id}/update-status", tags=["Supplier"])
+def update_shipment_status(replenishment_id: int, update: ShipmentUpdate, user: dict = Depends(get_current_user)):
+    if user["role"] != "supplier":
+        from fastapi import HTTPException
+        raise HTTPException(status_code=403, detail="Not authorized as supplier")
+        
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Check if shipment belongs to one of this supplier's facilities
+    cursor.execute("SELECT r.* FROM replenishment r JOIN facilities f ON r.facility_id = f.facility_id WHERE r.id = ? AND f.supplier_id = ?", (replenishment_id, user["reference_id"]))
+    shipment = cursor.fetchone()
+    
+    if not shipment:
+        conn.close()
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Shipment not found or unauthorized")
+        
+    actual_received = datetime.now().strftime("%Y-%m-%d") if update.status == "delivered" else None
+    
+    cursor.execute("UPDATE replenishment SET status = ?, expected_date = ?, actual_received_date = ? WHERE id = ?",
+                   (update.status, update.expected_date, actual_received, replenishment_id))
+                   
+    # If delivered, trigger a stock update
+    if update.status == "delivered":
+        today = datetime.now().strftime("%Y-%m-%d")
+        fac_id = shipment["facility_id"]
+        med_id = shipment["medicine_id"]
+        qty = shipment["quantity"]
+        
+        cursor.execute("SELECT quantity_on_hand FROM inventory WHERE facility_id = ? AND medicine_id = ? AND date = ?", 
+                       (fac_id, med_id, today))
+        row = cursor.fetchone()
+        old_qty = row["quantity_on_hand"] if row else 0
+        new_qty = old_qty + qty
+        
+        if row:
+            cursor.execute("UPDATE inventory SET quantity_on_hand = ? WHERE facility_id = ? AND medicine_id = ? AND date = ?",
+                           (new_qty, fac_id, med_id, today))
+        else:
+            cursor.execute("INSERT INTO inventory (facility_id, medicine_id, date, quantity_on_hand) VALUES (?, ?, ?, ?)",
+                           (fac_id, med_id, today, new_qty))
+                           
+        cursor.execute("""
+            INSERT INTO stock_updates (facility_id, medicine_id, user_id, role, old_qty, new_qty, note, source, timestamp)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (fac_id, med_id, user["id"], user["role"], old_qty, new_qty, f"Delivery received: {qty}", "Supplier-Confirmed", datetime.now().isoformat()))
+        
+    conn.commit()
+    conn.close()
+    return {"status": "success"}
+
+@app.get("/inventory/history", tags=["Inventory"])
+def get_inventory_history(facility_id: str, medicine_id: str, user: dict = Depends(get_current_user)):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT * FROM stock_updates 
+        WHERE facility_id = ? AND medicine_id = ?
+        ORDER BY timestamp DESC
+    """, (facility_id, medicine_id))
+    history = [dict(r) for r in cursor.fetchall()]
+    conn.close()
+    return history
 
 
 if __name__ == "__main__":

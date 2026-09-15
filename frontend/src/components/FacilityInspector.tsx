@@ -24,6 +24,7 @@ import {
 } from 'recharts';
 import type { Facility, RiskScore, Medicine, StockHistoryPoint } from '../types';
 import { useApi } from '../contexts/ApiContext';
+import { HistoryModal } from './HistoryModal';
 
 interface FacilityInspectorProps {
   facility: Facility;
@@ -38,6 +39,7 @@ export default function FacilityInspector({ facility, initialMedicineId, onClose
   const [visible, setVisible] = useState(false);
   const [chartData, setChartData] = useState<StockHistoryPoint[]>([]);
   const [chartLoading, setChartLoading] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setVisible(true), 10);
@@ -252,6 +254,12 @@ export default function FacilityInspector({ facility, initialMedicineId, onClose
                   <div className="text-[11px] text-slate-400 mt-1">
                     Est. Stockout: <span className="font-medium text-rose-600 font-mono">~{currentScore.projected_stockout_date} (predicted)</span>
                   </div>
+                  <button 
+                    onClick={() => setShowHistory(true)}
+                    className="mt-2 px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs rounded transition"
+                  >
+                    View History
+                  </button>
                 </div>
               </div>
             </div>
@@ -435,6 +443,14 @@ export default function FacilityInspector({ facility, initialMedicineId, onClose
           </button>
         </div>
       </div>
+
+      {showHistory && (
+        <HistoryModal 
+          facilityId={facility.facility_id}
+          medicineId={selectedMedicineId}
+          onClose={() => setShowHistory(false)}
+        />
+      )}
     </div>
   );
 }

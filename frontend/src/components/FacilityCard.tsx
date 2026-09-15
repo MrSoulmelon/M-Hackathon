@@ -9,7 +9,7 @@ interface FacilityCardProps {
 }
 
 export default function FacilityCard({ facility, onClick, highlighted }: FacilityCardProps) {
-  const { getFacilitySummary, riskScores } = useApi();
+  const { getFacilitySummary, riskScores, medicines } = useApi();
   const summary = getFacilitySummary(facility.facility_id);
 
   let borderClass = 'border-l-4 border-l-emerald-500 hover:border-emerald-600';
@@ -59,7 +59,7 @@ export default function FacilityCard({ facility, onClick, highlighted }: Facilit
         <div className="overflow-hidden mr-2">
           {riskItem ? (
             <span className="text-[11px] text-slate-500 truncate block">
-              Critical: <strong className={riskItem.risk_level === 'red' ? 'text-rose-600' : 'text-amber-600'}>{riskItem.medicine_name.split(' ')[0]}</strong> ({riskItem.days_of_supply}d supply left)
+              Critical: <strong className={riskItem.risk_level === 'red' ? 'text-rose-600' : 'text-amber-600'}>{(medicines.find(m => m.medicine_id === riskItem.medicine_id)?.name || riskItem.medicine_name || 'Unknown').split(' ')[0]}</strong> ({riskItem.days_of_supply}d supply left)
             </span>
           ) : (
             <span className="text-[11px] text-slate-400 block">All 8 monitored medicines stable</span>

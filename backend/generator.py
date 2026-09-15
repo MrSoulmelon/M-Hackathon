@@ -335,6 +335,11 @@ def simulate_operational_data(facilities, supplies):
                     qty_variation = float(np.random.uniform(0.9, 1.1))
                     order_qty = int(st["order_batch_size"] * qty_variation)
 
+                    if actual_received_str:
+                        status = "delivered"
+                    else:
+                        status = "shipped"
+
                     order_rec = {
                         "facility_id": fid,
                         "medicine_id": mid,
@@ -342,6 +347,7 @@ def simulate_operational_data(facilities, supplies):
                         "expected_date": expected_date_str,
                         "actual_received_date": actual_received_str,
                         "quantity": order_qty,
+                        "status": status,
                     }
                     replenishment_records.append(order_rec)
 
@@ -372,6 +378,24 @@ def save_to_csv_and_sqlite(facilities, supplies, inventory, consumption, repleni
     df_inventory = pd.DataFrame(inventory)
     df_consumption = pd.DataFrame(consumption)
     df_replenishment = pd.DataFrame(replenishment)
+    
+    # Generate seed users
+    users = []
+    from passlib.context import CryptContext
+    pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+    hashed_pwd = pwd_context.hash("password")
+    
+    # Admin
+    users.append({"id": "USR-001", "email": "admin@shortagewatch.com", "password_hash": hashed_pwd, "role": "admin", "reference_id": "GLOBAL"})
+    # Consumers (Facility Staff) - one for each facility
+    for idx, f in enumerate(facilities):
+        users.append({"id": f"USR-F{idx+1:03d}", "email": f"staff@{f['facility_id'].lower()}.com", "password_hash": hashed_pwd, "role": "consumer", "reference_id": f["facility_id"]})
+    # Suppliers - one for each supplier
+    supplier_ids = list(set([f["supplier_id"] for f in facilities]))
+    for idx, sid in enumerate(supplier_ids):
+        users.append({"id": f"USR-S{idx+1:03d}", "email": f"admin@{sid.lower()}.com", "password_hash": hashed_pwd, "role": "supplier", "reference_id": sid})
+    
+    df_users = pd.DataFrame(users)
 
     # 2. Export to CSV
     df_facilities.to_csv(os.path.join(CSV_DIR, "facilities.csv"), index=False)
@@ -445,8 +469,37 @@ def save_to_csv_and_sqlite(facilities, supplies, inventory, consumption, repleni
             expected_date TEXT NOT NULL,
             actual_received_date TEXT,
             quantity INTEGER NOT NULL,
+            status TEXT NOT NULL,
             FOREIGN KEY (facility_id) REFERENCES facilities(facility_id),
             FOREIGN KEY (medicine_id) REFERENCES supplies(medicine_id)
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE users (
+            id TEXT PRIMARY KEY,
+            email TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL,
+            role TEXT NOT NULL,
+            reference_id TEXT NOT NULL
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE stock_updates (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            facility_id TEXT NOT NULL,
+            medicine_id TEXT NOT NULL,
+            user_id TEXT NOT NULL,
+            role TEXT NOT NULL,
+            old_qty INTEGER NOT NULL,
+            new_qty INTEGER NOT NULL,
+            note TEXT NOT NULL,
+            source TEXT NOT NULL,
+            timestamp TEXT NOT NULL,
+            FOREIGN KEY (facility_id) REFERENCES facilities(facility_id),
+            FOREIGN KEY (medicine_id) REFERENCES supplies(medicine_id),
+            FOREIGN KEY (user_id) REFERENCES users(id)
         )
     """)
 
@@ -464,6 +517,7 @@ def save_to_csv_and_sqlite(facilities, supplies, inventory, consumption, repleni
     df_inventory.to_sql("inventory", conn, if_exists="append", index=False)
     df_consumption.to_sql("consumption", conn, if_exists="append", index=False)
     df_replenishment.to_sql("replenishment", conn, if_exists="append", index=False)
+    df_users.to_sql("users", conn, if_exists="append", index=False)
 
     conn.commit()
     conn.close()
