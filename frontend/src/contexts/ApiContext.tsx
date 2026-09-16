@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback, ReactNode } from 'react';
 import { mockFacilities, mockMedicines, mockRiskScores, mockAlerts, mockRecommendations, generateStockHistory } from '../data/mockData';
 import type { Facility, Medicine, RiskScore, Alert, Recommendation, StockHistoryPoint, RiskLevel } from '../types';
 
@@ -23,6 +23,7 @@ interface ApiContextType {
   getRiskScore: (facilityId: string, medicineId: string) => RiskScore | undefined;
   getChartData: (facilityId: string, medicineId: string, currentScore: RiskScore) => Promise<StockHistoryPoint[]>;
   approveRecommendation: (rec: Recommendation) => Promise<void>;
+  refreshData: () => Promise<void>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -36,42 +37,38 @@ export function ApiProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  useEffect(() => {
-    let isMounted = true;
-    async function fetchData() {
-      setLoading(true);
-      try {
-        const [facRes, medRes, riskRes, alertRes, recRes] = await Promise.allSettled([
-          fetch('http://localhost:8000/facilities').then(r => r.ok ? r.json() : Promise.reject(r)),
-          fetch('http://localhost:8000/supplies').then(r => r.ok ? r.json() : Promise.reject(r)),
-          fetch('http://localhost:8001/risk-scores').then(r => r.ok ? r.json() : Promise.reject(r)),
-          fetch('http://localhost:8001/alerts').then(r => r.ok ? r.json() : Promise.reject(r)),
-          fetch('http://localhost:8001/recommendations').then(r => r.ok ? r.json() : Promise.reject(r))
-        ]);
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [facRes, medRes, riskRes, alertRes, recRes] = await Promise.allSettled([
+        fetch('http://localhost:8000/facilities').then(r => r.ok ? r.json() : Promise.reject(r)),
+        fetch('http://localhost:8000/supplies').then(r => r.ok ? r.json() : Promise.reject(r)),
+        fetch('http://localhost:8001/risk-scores').then(r => r.ok ? r.json() : Promise.reject(r)),
+        fetch('http://localhost:8001/alerts').then(r => r.ok ? r.json() : Promise.reject(r)),
+        fetch('http://localhost:8001/recommendations').then(r => r.ok ? r.json() : Promise.reject(r))
+      ]);
 
-        if (!isMounted) return;
-
-        setFacilities(facRes.status === 'fulfilled' ? facRes.value : mockFacilities);
-        setMedicines(medRes.status === 'fulfilled' ? medRes.value : mockMedicines);
-        setRiskScores(riskRes.status === 'fulfilled' ? riskRes.value : mockRiskScores);
-        setAlerts(alertRes.status === 'fulfilled' ? alertRes.value : mockAlerts);
-        setRecommendations(recRes.status === 'fulfilled' ? recRes.value : mockRecommendations);
-      } catch (err) {
-        if (!isMounted) return;
-        console.error("Failed to fetch some data, using full fallback", err);
-        setFacilities(mockFacilities);
-        setMedicines(mockMedicines);
-        setRiskScores(mockRiskScores);
-        setAlerts(mockAlerts);
-        setRecommendations(mockRecommendations);
-        setError(err instanceof Error ? err : new Error('Unknown error'));
-      } finally {
-        if (isMounted) setLoading(false);
-      }
+      setFacilities(facRes.status === 'fulfilled' && Array.isArray(facRes.value) ? facRes.value : mockFacilities);
+      setMedicines(medRes.status === 'fulfilled' && Array.isArray(medRes.value) ? medRes.value : mockMedicines);
+      setRiskScores(riskRes.status === 'fulfilled' && Array.isArray(riskRes.value) ? riskRes.value : mockRiskScores);
+      setAlerts(alertRes.status === 'fulfilled' && Array.isArray(alertRes.value) ? alertRes.value : mockAlerts);
+      setRecommendations(recRes.status === 'fulfilled' && Array.isArray(recRes.value) ? recRes.value : mockRecommendations);
+    } catch (err) {
+      console.error("Failed to fetch some data, using full fallback", err);
+      setFacilities(mockFacilities);
+      setMedicines(mockMedicines);
+      setRiskScores(mockRiskScores);
+      setAlerts(mockAlerts);
+      setRecommendations(mockRecommendations);
+      setError(err instanceof Error ? err : new Error('Unknown error'));
+    } finally {
+      setLoading(false);
     }
-    fetchData();
-    return () => { isMounted = false; };
   }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const getFacilitySummary = useMemo(() => {
     return (facilityId: string): FacilitySummary => {
@@ -189,7 +186,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
   return (
     <ApiContext.Provider value={{
       facilities, medicines, riskScores, alerts, recommendations, loading, error,
-      getFacilitySummary, getFacility, getRiskScore, getChartData, approveRecommendation
+      getFacilitySummary, getFacility, getRiskScore, getChartData, approveRecommendation, refreshData: fetchData
     }}>
       {children}
     </ApiContext.Provider>

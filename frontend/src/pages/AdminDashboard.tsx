@@ -12,13 +12,14 @@ import { useApi } from '../contexts/ApiContext';
 import type { Facility, Alert } from '../types';
 
 export function AdminDashboard() {
-  const { facilities, medicines, alerts, riskScores, getFacilitySummary, loading } = useApi();
+  const { facilities, medicines, alerts, riskScores, getFacilitySummary, loading, refreshData } = useApi();
   const { user, logout } = useAuth();
   
   // Filters
   const [district, setDistrict] = useState('ALL');
   const [criticality, setCriticality] = useState('ALL');
   const [risk, setRisk] = useState('ALL');
+  const [searchQuery, setSearchQuery] = useState('');
   
   // UI State
   const [selectedFacility, setSelectedFacility] = useState<Facility | null>(null);
@@ -52,13 +53,17 @@ export function AdminDashboard() {
     openFacility(alert.affected_facilities[0], alert.medicine_id);
   }, [openFacility]);
 
-  const handleSync = useCallback(() => {
+  const handleSync = useCallback(async () => {
     setSyncing(true);
-    window.setTimeout(() => {
-      setSyncing(false);
+    try {
+      await refreshData();
       showToast('Telemetry Synchronized', '18 facilities up to date.');
-    }, 800);
-  }, [showToast]);
+    } catch (err) {
+      showToast('Sync Failed', 'Could not refresh data.');
+    } finally {
+      setSyncing(false);
+    }
+  }, [showToast, refreshData]);
 
   const handleApprove = useCallback((msg: string) => {
     showToast('Action Approved', msg);
@@ -78,16 +83,23 @@ export function AdminDashboard() {
       if (risk === 'healthy' && summary.worstRisk !== 'green') return false;
 
       if (criticality !== 'ALL') {
-        const categoryMedIds = medicines.filter((m) => m.category === criticality).map((m) => m.medicine_id);
+        const categoryMedIds = medicines.filter((m: any) => (m.category || m.criticality_tier) === criticality).map((m) => m.medicine_id);
         const hasMatchingScore = riskScores.some(
           (s) => s.facility_id === fac.facility_id && categoryMedIds.includes(s.medicine_id)
         );
         if (!hasMatchingScore) return false;
       }
+      
+      if (searchQuery.trim() !== '') {
+        const q = searchQuery.toLowerCase();
+        if (!fac.name.toLowerCase().includes(q) && !fac.facility_id.toLowerCase().includes(q)) {
+          return false;
+        }
+      }
 
       return true;
     });
-  }, [district, criticality, risk, facilities, medicines, riskScores, getFacilitySummary]);
+  }, [district, criticality, risk, searchQuery, facilities, medicines, riskScores, getFacilitySummary]);
 
   const resetFilters = () => {
     setDistrict('ALL');
@@ -106,7 +118,6 @@ export function AdminDashboard() {
 
   // Cap alerts for dashboard cleanliness
   const topAlerts = alerts.slice(0, 3);
-  const hiddenAlertsCount = alerts.length - topAlerts.length;
 
   return (
     <div className="min-h-screen flex flex-col font-sans overflow-hidden bg-medical-theme text-slate-900">
@@ -123,6 +134,8 @@ export function AdminDashboard() {
           setCriticality={setCriticality}
           risk={risk}
           setRisk={setRisk}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
           onSync={handleSync}
           syncing={syncing}
         />
@@ -203,12 +216,6 @@ export function AdminDashboard() {
                   {topAlerts.map((alert) => (
                     <AlertBanner key={alert.alert_id} alert={alert} onViewDetails={handleAlertDetails} />
                   ))}
-                  
-                  {hiddenAlertsCount > 0 && (
-                    <div className="w-full py-2 text-center border border-dashed border-slate-300 rounded-xl bg-white shadow-sm text-xs font-medium text-slate-500">
-                      +{hiddenAlertsCount} lower-priority alerts hidden
-                    </div>
-                  )}
                 </div>
               </section>
             )}

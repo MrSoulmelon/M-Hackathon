@@ -335,10 +335,13 @@ def manual_update_inventory(update: ManualUpdate, user: dict = Depends(get_curre
         raise HTTPException(status_code=403, detail="Not authorized as consumer")
     
     facility_id = user["reference_id"]
-    today = datetime.now().strftime("%Y-%m-%d")
     
     conn = get_db_connection()
     cursor = conn.cursor()
+    
+    cursor.execute("SELECT MAX(date) as max_date FROM inventory")
+    row = cursor.fetchone()
+    today = row["max_date"] if row and row["max_date"] else datetime.now().strftime("%Y-%m-%d")
     
     # Get current quantity
     cursor.execute("SELECT quantity_on_hand FROM inventory WHERE facility_id = ? AND medicine_id = ? AND date = ?", 
@@ -362,6 +365,13 @@ def manual_update_inventory(update: ManualUpdate, user: dict = Depends(get_curre
     
     conn.commit()
     conn.close()
+    
+    import httpx
+    try:
+        httpx.post("http://localhost:8001/refresh", timeout=2.0)
+    except Exception as e:
+        print(f"Could not notify detection engine: {e}")
+        
     return {"status": "success"}
 
 @app.get("/my-shipments", tags=["Supplier"])
@@ -414,7 +424,10 @@ def update_shipment_status(replenishment_id: int, update: ShipmentUpdate, user: 
                    
     # If delivered, trigger a stock update
     if update.status == "delivered":
-        today = datetime.now().strftime("%Y-%m-%d")
+        cursor.execute("SELECT MAX(date) as max_date FROM inventory")
+        row_max = cursor.fetchone()
+        today = row_max["max_date"] if row_max and row_max["max_date"] else datetime.now().strftime("%Y-%m-%d")
+        
         fac_id = shipment["facility_id"]
         med_id = shipment["medicine_id"]
         qty = shipment["quantity"]
@@ -439,6 +452,14 @@ def update_shipment_status(replenishment_id: int, update: ShipmentUpdate, user: 
         
     conn.commit()
     conn.close()
+    
+    if update.status == "delivered":
+        import httpx
+        try:
+            httpx.post("http://localhost:8001/refresh", timeout=2.0)
+        except Exception as e:
+            print(f"Could not notify detection engine: {e}")
+            
     return {"status": "success"}
 
 @app.get("/inventory/history", tags=["Inventory"])
@@ -506,7 +527,10 @@ def approve_recommendation(body: ApproveRecommendation, user: dict = Depends(get
 
     # For redistribution: physically move stock in the DB
     if body.action_type == "redistribution" and body.from_facility_id and body.to_facility_id and body.medicine_id and body.suggested_quantity:
-        today = datetime.now().strftime("%Y-%m-%d")
+        cursor.execute("SELECT MAX(date) as max_date FROM inventory")
+        row_max = cursor.fetchone()
+        today = row_max["max_date"] if row_max and row_max["max_date"] else datetime.now().strftime("%Y-%m-%d")
+        
         from_fid = body.from_facility_id
         to_fid = body.to_facility_id
         mid = body.medicine_id

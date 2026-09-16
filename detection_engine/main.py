@@ -37,7 +37,34 @@ async def lifespan(app: FastAPI):
     loader = DataLoader()
     data = loader.load_all()
 
-    risk_scores = compute_risk_scores(data)
+    raw_risk_scores = compute_risk_scores(data)
+    
+    # --- DEMO OVERRIDE: User requested exactly 2 red and 3 yellow, rest green ---
+    # We will enforce this on the specific facilities from the original mock data
+    demo_targets = {
+        ("FAC-001", "MED-001"): "red",
+        ("FAC-002", "MED-001"): "red",
+        ("FAC-003", "MED-001"): "amber",
+        ("FAC-013", "MED-001"): "amber",
+        ("FAC-009", "MED-008"): "amber"
+    }
+    
+    risk_scores = []
+    for s in raw_risk_scores:
+        key = (s["facility_id"], s["medicine_id"])
+        if key in demo_targets:
+            # If they manually update the stock, dos goes up.
+            # Only keep it red/amber if the stock is actually low (< 14 days)
+            # or if it was originally calculated as red/amber
+            if s["days_of_supply"] < 14 or s["risk_level"] in ["red", "amber"]:
+                s["risk_level"] = demo_targets[key]
+            else:
+                s["risk_level"] = "green"
+        else:
+            s["risk_level"] = "green"
+        risk_scores.append(s)
+    # --------------------------------------------------------------------------
+
     alerts = detect_alerts(data, risk_scores)
     recommendations = generate_recommendations(data, risk_scores, alerts)
 
@@ -212,7 +239,43 @@ def approve_recommendation(body: ApproveBody):
             ]
 
     return {"status": "approved", "recommendation_id": body.recommendation_id}
+    
+@app.post("/refresh")
+def refresh_data():
+    """Reload all data from backend/CSV and recompute scores."""
+    loader = DataLoader()
+    data = loader.load_all()
 
+    raw_risk_scores = compute_risk_scores(data)
+    
+    demo_targets = {
+        ("FAC-001", "MED-001"): "red",
+        ("FAC-002", "MED-001"): "red",
+        ("FAC-003", "MED-001"): "amber",
+        ("FAC-013", "MED-001"): "amber",
+        ("FAC-009", "MED-008"): "amber"
+    }
+    risk_scores = []
+    for s in raw_risk_scores:
+        key = (s["facility_id"], s["medicine_id"])
+        if key in demo_targets:
+            if s["days_of_supply"] < 14 or s["risk_level"] in ["red", "amber"]:
+                s["risk_level"] = demo_targets[key]
+            else:
+                s["risk_level"] = "green"
+        else:
+            s["risk_level"] = "green"
+        risk_scores.append(s)
+
+    alerts = detect_alerts(data, risk_scores)
+    recommendations = generate_recommendations(data, risk_scores, alerts)
+
+    engine_state["data"] = data
+    engine_state["risk_scores"] = risk_scores
+    engine_state["alerts"] = alerts
+    engine_state["recommendations"] = recommendations
+    
+    return {"status": "refreshed", "scores_count": len(risk_scores)}
 
 # ─── Run ────────────────────────────────────────────────────────────────
 

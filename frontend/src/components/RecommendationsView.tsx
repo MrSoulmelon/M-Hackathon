@@ -9,7 +9,7 @@ interface RecommendationsViewProps {
 
 export default function RecommendationsView({ onInspect, onApprove }: RecommendationsViewProps) {
   const { recommendations } = useApi();
-  const sorted = [...recommendations].sort((a, b) => b.priority_score - a.priority_score);
+  const sorted = [...recommendations].sort((a, b) => b.priority_score - a.priority_score).slice(0, 5);
 
   return (
     <div className="space-y-3">
