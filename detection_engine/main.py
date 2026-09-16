@@ -16,9 +16,11 @@ analysis stages, and caches the results in memory.
 from contextlib import asynccontextmanager
 from typing import Optional
 
+import pandas as pd
 import uvicorn
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
 from data_loader import DataLoader
 from risk_scorer import compute_risk_scores
@@ -113,6 +115,103 @@ def get_alerts():
 @app.get("/recommendations")
 def get_recommendations():
     return engine_state.get("recommendations", [])
+
+
+class ApproveBody(BaseModel):
+    recommendation_id: str
+    action_type: str
+    medicine_name: Optional[str] = None
+    from_facility_id: Optional[str] = None
+    to_facility_id: Optional[str] = None
+    suggested_quantity: Optional[int] = None
+    medicine_id: Optional[str] = None
+
+@app.post("/recommendations/approve")
+def approve_recommendation(body: ApproveBody):
+    """
+    Approve a recommendation:
+    1. Remove it from the in-memory recommendations list.
+    2. If it's a redistribution, transfer stock between facilities
+       in the in-memory inventory DataFrame so risk scores reflect reality.
+    3. Recompute risk scores and regenerate remaining recommendations.
+    """
+    recs: list = engine_state.get("recommendations", [])
+
+    # Find the matched recommendation for its full details
+    matched = next((r for r in recs if r["recommendation_id"] == body.recommendation_id), None)
+
+    # Remove from list regardless
+    engine_state["recommendations"] = [
+        r for r in recs if r["recommendation_id"] != body.recommendation_id
+    ]
+
+    # For redistributions: update in-memory inventory so the risk scores change
+    if matched and matched["type"] == "redistribution":
+        from_fid = matched.get("from_facility_id")
+        to_fid = matched.get("to_facility_id")
+        mid = matched.get("medicine_id")
+        qty = matched.get("suggested_quantity") or 0
+
+        if from_fid and to_fid and mid and qty > 0:
+            inv_df = engine_state["data"]["inventory"]
+            today = inv_df["date"].max()
+
+            # Helper: get latest quantity for a facility+medicine
+            def latest_qty(fid, medicine_id):
+                rows = inv_df[
+                    (inv_df["facility_id"] == fid) &
+                    (inv_df["medicine_id"] == medicine_id) &
+                    (inv_df["date"] == today)
+                ]
+                if rows.empty:
+                    rows = inv_df[
+                        (inv_df["facility_id"] == fid) &
+                        (inv_df["medicine_id"] == medicine_id)
+                    ].sort_values("date")
+                    if rows.empty:
+                        return 0
+                    return int(rows.iloc[-1]["quantity_on_hand"])
+                return int(rows.iloc[0]["quantity_on_hand"])
+
+            from_qty = latest_qty(from_fid, mid)
+            to_qty = latest_qty(to_fid, mid)
+
+            actual_transfer = min(qty, from_qty)  # can't send more than available
+
+            # Remove existing today rows and insert updated ones
+            mask = (
+                (inv_df["facility_id"].isin([from_fid, to_fid])) &
+                (inv_df["medicine_id"] == mid) &
+                (inv_df["date"] == today)
+            )
+            inv_df = inv_df[~mask]
+
+            new_rows = pd.DataFrame([
+                {"facility_id": from_fid, "medicine_id": mid, "date": today, "quantity_on_hand": max(0, from_qty - actual_transfer)},
+                {"facility_id": to_fid,   "medicine_id": mid, "date": today, "quantity_on_hand": to_qty + actual_transfer},
+            ])
+            engine_state["data"]["inventory"] = pd.concat([inv_df, new_rows], ignore_index=True)
+
+            # Recompute risk scores and re-generate remaining recommendations
+            new_risk_scores = compute_risk_scores(engine_state["data"])
+            engine_state["risk_scores"] = new_risk_scores
+            new_recs = generate_recommendations(
+                engine_state["data"],
+                new_risk_scores,
+                engine_state["alerts"]
+            )
+            # Keep only recs that haven't been approved yet (preserve dismissals)
+            approved_ids = {r["recommendation_id"] for r in engine_state["recommendations"]}
+            engine_state["recommendations"] = [
+                r for r in new_recs if r["recommendation_id"] not in approved_ids
+                # Note: REC IDs are re-generated, so after this point
+                # previously approved REC-001 may reappear only if the
+                # problem still exists. That's intentional — if the
+                # redistribution fixed it, the risk score goes green
+                # and no new rec is generated for that pair.
+            ]
+
+    return {"status": "approved", "recommendation_id": body.recommendation_id}
 
 
 # ─── Run ────────────────────────────────────────────────────────────────

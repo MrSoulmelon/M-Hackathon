@@ -149,30 +149,43 @@ def detect_alerts(
                 for fid in affected_facs:
                     systemic_pairs.add((fid, medicine_id))
 
-    # ── 2. Local (isolated) alerts ──────────────────────────────────
+    # ── 2. Local (isolated) alerts — grouped by facility ───────────────
+    # Collect all uncovered amber/red (facility, medicine) pairs per facility
+    local_by_facility: dict[str, list[dict]] = {}
     for rs in risk_scores:
         if rs["risk_level"] not in ("amber", "red"):
             continue
         key = (rs["facility_id"], rs["medicine_id"])
         if key in systemic_pairs:
             continue  # Already part of a systemic alert
+        fid = rs["facility_id"]
+        local_by_facility.setdefault(fid, []).append(rs)
 
-        fac_row = facilities_df[
-            facilities_df["facility_id"] == rs["facility_id"]
-        ]
+    for fid, affected_scores in local_by_facility.items():
+        fac_row = facilities_df[facilities_df["facility_id"] == fid]
         if fac_row.empty:
             continue
 
         district = fac_row.iloc[0]["district"]
         supplier = fac_row.iloc[0]["supplier_id"]
 
-        # Diagnose: what's the primary driver?
-        if abs(rs["signals"]["consumption_anomaly_score"]) > 1.5:
+        # Sort by worst risk first, then fewest days of supply
+        affected_scores.sort(key=lambda r: (0 if r["risk_level"] == "red" else 1, r["days_of_supply"]))
+
+        # Pick the worst medicine as the "headline" medicine
+        worst = affected_scores[0]
+        medicine_ids = [r["medicine_id"] for r in affected_scores]
+
+        # Diagnose based on the worst offender
+        if abs(worst["signals"]["consumption_anomaly_score"]) > 1.5:
             diagnosis = "demand_spike"
-        elif rs["signals"]["replenishment_status"] in ("delayed", "overdue"):
+        elif worst["signals"]["replenishment_status"] in ("delayed", "overdue"):
             diagnosis = "supplier_delay"
         else:
             diagnosis = "mixed"
+
+        n_meds = len(medicine_ids)
+        med_label = worst["medicine_id"] if n_meds == 1 else f"{worst['medicine_id']} +{n_meds - 1} more"
 
         alert_counter += 1
         alerts.append(
@@ -181,16 +194,17 @@ def detect_alerts(
                 "scope": "local",
                 "district": district,
                 "supplier_id": supplier,
-                "medicine_id": rs["medicine_id"],
-                "affected_facilities": [rs["facility_id"]],
+                "medicine_id": worst["medicine_id"],
+                "medicine_ids": medicine_ids,
+                "affected_facilities": [fid],
                 "pct_facilities_amber_or_red": 100.0,
                 "diagnosis": diagnosis,
                 "summary": _build_summary(
                     "local",
                     diagnosis,
-                    rs["medicine_id"],
+                    med_label,
                     supplier,
-                    [rs["facility_id"]],
+                    [fid],
                     1.0,
                 ),
             }

@@ -13,23 +13,26 @@ interface HeaderProps {
 
 function SelectWrap({
   icon,
+  label,
   value,
   onChange,
   options,
 }: {
   icon: React.ReactNode;
+  label: string;
   value: string;
   onChange: (v: string) => void;
   options: { value: string; label: string }[];
 }) {
   return (
-    <div className="relative">
+    <div className="flex flex-col gap-0.5">
+      <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest pl-0.5">{label}</span>
       <div className="relative flex items-center">
         <span className="absolute left-2.5 pointer-events-none text-slate-400">{icon}</span>
         <select
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="text-xs font-medium pl-8 pr-8 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-colors appearance-none cursor-pointer"
+          className="text-xs font-medium pl-8 pr-7 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-400/30 focus:border-sky-400 transition-colors appearance-none cursor-pointer hover:border-slate-300"
         >
           {options.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -37,7 +40,7 @@ function SelectWrap({
             </option>
           ))}
         </select>
-        <ChevronDown className="w-3 h-3 text-slate-400 absolute right-2.5 pointer-events-none" />
+        <ChevronDown className="w-3 h-3 text-slate-400 absolute right-2 pointer-events-none" />
       </div>
     </div>
   );
@@ -45,30 +48,47 @@ function SelectWrap({
 
 export default function Header({ district, setDistrict, criticality, setCriticality, risk, setRisk, onSync, syncing }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-slate-200/80 backdrop-blur supports-[backdrop-filter]:bg-white/90">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <header className="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+      {/* Top bar: brand + live status */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="h-9 w-9 rounded-lg bg-slate-900 flex items-center justify-center text-white shadow-sm ring-1 ring-slate-800">
-            <ShieldAlert className="w-5 h-5 text-sky-400" />
+          <div className="h-8 w-8 rounded-lg bg-slate-900 flex items-center justify-center text-white">
+            <ShieldAlert className="w-4.5 h-4.5 text-sky-400" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-slate-900 tracking-tight text-lg">ShortageWatch</span>
-              <span className="px-2 py-0.5 text-[10px] font-medium tracking-wide uppercase bg-sky-50 text-sky-700 border border-sky-200 rounded-full">
-                Early Warning Engine
+              <span className="font-bold text-slate-900 tracking-tight text-base">ShortageWatch</span>
+              <span className="hidden sm:inline px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide bg-sky-50 text-sky-600 border border-sky-200 rounded-full">
+                Admin
               </span>
             </div>
-            <p className="text-xs text-slate-500 hidden sm:block">Predictive Regional Supply Chain & Clinical Triage</p>
+            <p className="text-[11px] text-slate-400 hidden sm:block mt-0.5 leading-none">
+              Regional medicine stock monitoring & supply alerts
+            </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <button
+          onClick={onSync}
+          title="Refresh live telemetry"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-medium text-slate-600 transition"
+        >
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="hidden sm:inline text-slate-500 font-mono text-[11px]">Live</span>
+          <RefreshCw className={`w-3.5 h-3.5 text-slate-400 ${syncing ? 'animate-spin' : ''}`} />
+        </button>
+      </div>
+
+      {/* Filter bar */}
+      <div className="bg-slate-50 border-t border-slate-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex items-end gap-4 flex-wrap">
           <SelectWrap
             icon={<MapPin className="w-3.5 h-3.5" />}
+            label="District"
             value={district}
             onChange={setDistrict}
             options={[
-              { value: 'ALL', label: 'All Districts (4)' },
+              { value: 'ALL', label: 'All Districts' },
               { value: 'Central Metro', label: 'Central Metro' },
               { value: 'Northern Highland', label: 'Northern Highland' },
               { value: 'Eastern Valley', label: 'Eastern Valley' },
@@ -77,39 +97,27 @@ export default function Header({ district, setDistrict, criticality, setCritical
           />
           <SelectWrap
             icon={<Pill className="w-3.5 h-3.5" />}
+            label="Medicine Type"
             value={criticality}
             onChange={setCriticality}
             options={[
-              { value: 'ALL', label: 'All Medicines (8)' },
-              { value: 'essential', label: 'Essential Medicines Only' },
-              { value: 'routine', label: 'Routine Medicines Only' },
+              { value: 'ALL', label: 'All Medicines' },
+              { value: 'essential', label: 'Essential Only' },
+              { value: 'routine', label: 'Routine Only' },
             ]}
           />
-          <div className="hidden md:block">
-            <SelectWrap
-              icon={<Filter className="w-3.5 h-3.5" />}
-              value={risk}
-              onChange={setRisk}
-              options={[
-                { value: 'ALL', label: 'All Risk Levels' },
-                { value: 'critical', label: 'Critical (Red) Only' },
-                { value: 'amber', label: 'At Risk (Amber)' },
-                { value: 'healthy', label: 'Healthy (Green)' },
-              ]}
-            />
-          </div>
-
-          <div className="h-5 w-px bg-slate-200" />
-
-          <button
-            onClick={onSync}
-            title="Refresh live telemetry stream"
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-medium text-slate-600 transition"
-          >
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="font-mono text-[11px] text-slate-500">Live API</span>
-            <RefreshCw className={`w-3 h-3 ml-0.5 text-slate-400 ${syncing ? 'animate-spin' : ''}`} />
-          </button>
+          <SelectWrap
+            icon={<Filter className="w-3.5 h-3.5" />}
+            label="Risk Level"
+            value={risk}
+            onChange={setRisk}
+            options={[
+              { value: 'ALL', label: 'All Levels' },
+              { value: 'critical', label: 'Critical' },
+              { value: 'amber', label: 'At Risk' },
+              { value: 'healthy', label: 'Healthy' },
+            ]}
+          />
         </div>
       </div>
     </header>

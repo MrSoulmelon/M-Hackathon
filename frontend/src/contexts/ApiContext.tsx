@@ -22,6 +22,7 @@ interface ApiContextType {
   getFacility: (facilityId: string) => Facility | undefined;
   getRiskScore: (facilityId: string, medicineId: string) => RiskScore | undefined;
   getChartData: (facilityId: string, medicineId: string, currentScore: RiskScore) => Promise<StockHistoryPoint[]>;
+  approveRecommendation: (rec: Recommendation) => Promise<void>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -129,10 +130,66 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const approveRecommendation = async (rec: Recommendation): Promise<void> => {
+    // 1. Optimistically remove the card from UI immediately
+    setRecommendations(prev => prev.filter(r => r.recommendation_id !== rec.recommendation_id));
+
+    try {
+      const token = localStorage.getItem('token');
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const body = {
+        recommendation_id: rec.recommendation_id,
+        action_type: rec.type,
+        medicine_name: rec.medicine_name,
+        medicine_id: rec.medicine_id,
+        from_facility_id: rec.from_facility_id ?? null,
+        to_facility_id: rec.to_facility_id,
+        suggested_quantity: rec.suggested_quantity ?? null,
+        note: 'Approved via dashboard',
+      };
+
+      // 2. Tell detection engine (port 8001) — this updates in-memory inventory
+      //    and recomputes risk scores so the facility card changes immediately
+      await fetch('http://localhost:8001/recommendations/approve', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(body),
+      });
+
+      // 3. Also tell backend (port 8000) to persist to DB so it survives restart
+      await fetch('http://localhost:8000/recommendations/approve', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(body),
+      });
+
+      // 4. Fetch updated risk scores and recommendations from detection engine
+      //    so the facility cards immediately reflect the new stock levels
+      const [newRiskRes, newRecRes] = await Promise.allSettled([
+        fetch('http://localhost:8001/risk-scores').then(r => r.ok ? r.json() : Promise.reject(r)),
+        fetch('http://localhost:8001/recommendations').then(r => r.ok ? r.json() : Promise.reject(r)),
+      ]);
+
+      if (newRiskRes.status === 'fulfilled') {
+        setRiskScores(newRiskRes.value);
+      }
+      if (newRecRes.status === 'fulfilled') {
+        // The engine already removed the approved rec and regenerated the rest
+        setRecommendations(newRecRes.value);
+      }
+
+    } catch (err) {
+      // Backends may be offline — UI removal still stands
+      console.warn('Could not fully process approval:', err);
+    }
+  };
+
   return (
     <ApiContext.Provider value={{
       facilities, medicines, riskScores, alerts, recommendations, loading, error,
-      getFacilitySummary, getFacility, getRiskScore, getChartData
+      getFacilitySummary, getFacility, getRiskScore, getChartData, approveRecommendation
     }}>
       {children}
     </ApiContext.Provider>

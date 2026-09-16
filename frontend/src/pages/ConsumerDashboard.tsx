@@ -70,53 +70,81 @@ export const ConsumerDashboard: React.FC = () => {
   if (loading) return <div className="p-8 text-center">Loading...</div>;
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center">
-        <div>
-          <h1 className="text-xl font-bold text-slate-800">{facility?.name || 'My Facility'}</h1>
-          <p className="text-sm text-slate-500">Consumer Dashboard • {user?.email}</p>
-        </div>
-        <button onClick={logout} className="text-sm text-slate-600 hover:text-slate-900 border px-3 py-1.5 rounded">Logout</button>
-      </header>
+    <div className="min-h-screen flex flex-col font-sans overflow-hidden bg-medical-theme text-slate-900">
+      
+      {/* Background Orbs */}
+      <div className="fixed top-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-40 pointer-events-none z-0"></div>
+      <div className="fixed bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-teal-400 rounded-full mix-blend-multiply filter blur-[128px] opacity-40 pointer-events-none z-0"></div>
 
-      <main className="max-w-5xl mx-auto p-6 mt-4">
-        <h2 className="text-lg font-semibold mb-4">My Stock</h2>
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-slate-50 border-b border-slate-200 text-sm font-medium text-slate-600">
-                <th className="p-4">Medicine</th>
-                <th className="p-4">Current Qty</th>
-                <th className="p-4">Last Updated</th>
-                <th className="p-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="text-sm text-slate-700">
-              {inventory.map(item => {
-                const med = medicines.find(m => m.medicine_id === item.medicine_id);
-                return (
-                  <tr key={item.medicine_id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
-                    <td className="p-4 font-medium">{med?.name || item.medicine_id}</td>
-                    <td className="p-4">{item.quantity_on_hand} {med?.unit}</td>
-                    <td className="p-4">{item.date}</td>
-                    <td className="p-4 text-right">
-                      <button 
-                        onClick={() => setSelectedMed({ id: item.medicine_id, name: med?.name, qty: item.quantity_on_hand })}
-                        className="text-blue-600 hover:text-blue-800 font-medium text-xs px-3 py-1 bg-blue-50 hover:bg-blue-100 rounded-full transition"
-                      >
-                        Update Stock
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-          {inventory.length === 0 && (
-            <div className="p-8 text-center text-slate-500">No inventory records found.</div>
-          )}
-        </div>
-      </main>
+      <div className="relative z-10 flex flex-col flex-1">
+        <header className="bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 py-4 flex justify-between items-center sticky top-0 z-50">
+          <div className="flex items-center gap-3">
+            <div className="bg-blue-600 p-1.5 rounded-lg">
+              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-slate-900 tracking-tight">{facility?.name || 'Clinic Portal'}</h1>
+              <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">{user?.email}</p>
+            </div>
+          </div>
+          <button onClick={logout} className="text-sm font-semibold text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-100 px-4 py-2 rounded-xl transition">
+            Sign Out
+          </button>
+        </header>
+
+        <main className="flex-1 max-w-5xl w-full mx-auto p-6 mt-4">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-bold text-slate-800">Current Inventory</h2>
+            <div className="text-xs font-semibold text-slate-500 uppercase tracking-widest">
+              {inventory.length} Items Tracked
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-50/80 border-b border-slate-200 text-xs uppercase tracking-wider font-semibold text-slate-500">
+                  <th className="p-4 px-6">Medicine</th>
+                  <th className="p-4 px-6">Current Stock</th>
+                  <th className="p-4 px-6">Last Updated</th>
+                  <th className="p-4 px-6 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="text-sm text-slate-700 divide-y divide-slate-100">
+                {inventory.map(item => {
+                  const med = medicines.find(m => m.medicine_id === item.medicine_id);
+                  return (
+                    <tr key={item.medicine_id} className="hover:bg-slate-50/50 transition">
+                      <td className="p-4 px-6 font-semibold text-slate-900">{med?.name || item.medicine_id}</td>
+                      <td className="p-4 px-6">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 font-semibold border border-blue-100">
+                          {item.quantity_on_hand} <span className="text-[10px] uppercase opacity-70">{med?.unit || 'units'}</span>
+                        </span>
+                      </td>
+                      <td className="p-4 px-6 text-slate-500">{item.date}</td>
+                      <td className="p-4 px-6 text-right">
+                        <button 
+                          onClick={() => setSelectedMed({ id: item.medicine_id, name: med?.name, qty: item.quantity_on_hand })}
+                          className="text-blue-600 hover:text-white font-semibold text-xs px-4 py-2 border border-blue-200 hover:border-blue-600 bg-white hover:bg-blue-600 rounded-xl transition shadow-sm"
+                        >
+                          Update Stock
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+            {inventory.length === 0 && (
+              <div className="p-12 text-center text-slate-500 bg-slate-50/50">
+                <p className="font-medium">No inventory records found.</p>
+              </div>
+            )}
+          </div>
+        </main>
+      </div>
 
       {selectedMed && (
         <StockUpdateModal 

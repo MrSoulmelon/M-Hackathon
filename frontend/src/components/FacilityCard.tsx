@@ -8,7 +8,7 @@ interface FacilityCardProps {
   highlighted: boolean;
 }
 
-export default function FacilityCard({ facility, onClick, highlighted }: FacilityCardProps) {
+export default function FacilityCard({ facility, onClick, highlighted = false }: FacilityCardProps) {
   const { getFacilitySummary, riskScores, medicines } = useApi();
   const summary = getFacilitySummary(facility.facility_id);
 
@@ -33,12 +33,12 @@ export default function FacilityCard({ facility, onClick, highlighted }: Facilit
     (s) => s.facility_id === facility.facility_id && (s.risk_level === 'red' || s.risk_level === 'amber')
   );
 
-  const highlightRing = highlighted ? 'ring-2 ring-sky-400 ring-offset-1' : '';
+  const highlightRing = highlighted ? 'ring-2 ring-blue-500 shadow-md' : 'shadow-sm';
 
   return (
     <div
       onClick={onClick}
-      className={`group bg-white rounded-xl p-4 border border-slate-200 shadow-xs hover:shadow-md transition-all cursor-pointer ${borderClass} ${highlightRing}`}
+      className={`group bg-white rounded-2xl p-4 border border-slate-200 hover:shadow-md transition-all cursor-pointer ${borderClass} ${highlightRing}`}
     >
       <div className="flex items-start justify-between">
         <div className="space-y-0.5">
@@ -65,7 +65,7 @@ export default function FacilityCard({ facility, onClick, highlighted }: Facilit
             <span className="text-[11px] text-slate-400 block">All 8 monitored medicines stable</span>
           )}
         </div>
-        <div className="flex items-center gap-1 text-slate-400 group-hover:text-sky-600 text-xs font-medium shrink-0 transition-colors">
+        <div className="flex items-center gap-1 px-2.5 py-1 rounded-md border border-slate-200 bg-slate-50 group-hover:bg-sky-50 group-hover:border-sky-200 group-hover:text-sky-700 text-slate-500 text-[11px] font-medium shrink-0 transition-colors">
           <span>Inspect</span>
           <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
         </div>

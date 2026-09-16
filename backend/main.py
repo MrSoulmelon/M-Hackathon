@@ -455,6 +455,99 @@ def get_inventory_history(facility_id: str, medicine_id: str, user: dict = Depen
     return history
 
 
+class ApproveRecommendation(BaseModel):
+    recommendation_id: str
+    action_type: str
+    medicine_name: str
+    medicine_id: Optional[str] = None
+    from_facility_id: Optional[str] = None
+    to_facility_id: Optional[str] = None
+    suggested_quantity: Optional[int] = None
+    note: str = ""
+
+@app.post("/recommendations/approve", tags=["Admin"])
+def approve_recommendation(body: ApproveRecommendation, user: dict = Depends(get_current_user)):
+    """
+    Admin approves a triage recommendation.
+    - Records it in approved_actions table.
+    - If redistribution: transfers inventory between facilities in the DB
+      so risk scores are correct after a restart.
+    """
+    if user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Only admins can approve recommendations")
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Ensure approved_actions table exists
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS approved_actions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            recommendation_id TEXT NOT NULL,
+            action_type TEXT NOT NULL,
+            medicine_name TEXT NOT NULL,
+            approved_by INTEGER NOT NULL,
+            note TEXT,
+            timestamp TEXT NOT NULL
+        )
+    """)
+
+    cursor.execute("""
+        INSERT INTO approved_actions (recommendation_id, action_type, medicine_name, approved_by, note, timestamp)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """, (
+        body.recommendation_id,
+        body.action_type,
+        body.medicine_name,
+        user["id"],
+        body.note,
+        datetime.now().isoformat()
+    ))
+
+    # For redistribution: physically move stock in the DB
+    if body.action_type == "redistribution" and body.from_facility_id and body.to_facility_id and body.medicine_id and body.suggested_quantity:
+        today = datetime.now().strftime("%Y-%m-%d")
+        from_fid = body.from_facility_id
+        to_fid = body.to_facility_id
+        mid = body.medicine_id
+        qty = body.suggested_quantity
+
+        # Get current quantities (latest date for each)
+        def get_latest_qty(fid):
+            cursor.execute("""
+                SELECT quantity_on_hand FROM inventory
+                WHERE facility_id = ? AND medicine_id = ?
+                ORDER BY date DESC LIMIT 1
+            """, (fid, mid))
+            row = cursor.fetchone()
+            return row["quantity_on_hand"] if row else 0
+
+        from_qty = get_latest_qty(from_fid)
+        to_qty = get_latest_qty(to_fid)
+        actual_transfer = min(qty, from_qty)
+
+        # Write today's updated snapshot for each facility
+        for fid, new_qty in [(from_fid, max(0, from_qty - actual_transfer)), (to_fid, to_qty + actual_transfer)]:
+            cursor.execute("SELECT id FROM inventory WHERE facility_id = ? AND medicine_id = ? AND date = ?", (fid, mid, today))
+            if cursor.fetchone():
+                cursor.execute("UPDATE inventory SET quantity_on_hand = ? WHERE facility_id = ? AND medicine_id = ? AND date = ?",
+                               (new_qty, fid, mid, today))
+            else:
+                cursor.execute("INSERT INTO inventory (facility_id, medicine_id, date, quantity_on_hand) VALUES (?, ?, ?, ?)",
+                               (fid, mid, today, new_qty))
+
+        # Log in stock_updates audit table
+        cursor.execute("""
+            INSERT OR IGNORE INTO stock_updates (facility_id, medicine_id, user_id, role, old_qty, new_qty, note, source, timestamp)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (to_fid, mid, user["id"], user["role"], to_qty, to_qty + actual_transfer,
+              f"Transfer from {from_fid} — approved rec {body.recommendation_id}", "Admin-Approved", datetime.now().isoformat()))
+
+    conn.commit()
+    conn.close()
+    return {"status": "approved", "recommendation_id": body.recommendation_id}
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

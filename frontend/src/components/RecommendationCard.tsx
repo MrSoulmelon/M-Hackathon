@@ -1,79 +1,102 @@
-import { ArrowRightLeft, Clock, Flag, ArrowRight, Navigation } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowRightLeft, Clock, Flag, ArrowRight, Navigation, Check, Loader2 } from 'lucide-react';
 import type { Recommendation } from '../types';
 import { useApi } from '../contexts/ApiContext';
 
 interface RecommendationCardProps {
   rec: Recommendation;
   onInspect: (facilityId: string, medicineId: string) => void;
-  onApprove: (msg: string) => void;
+  onApprove: (msg: string) => void; // kept for toast notification
 }
 
 export default function RecommendationCard({ rec, onInspect, onApprove }: RecommendationCardProps) {
-  const { getFacility } = useApi();
-  let TagIcon = ArrowRightLeft;
-  let tagClass = 'bg-sky-50 text-sky-700 border-sky-200';
+  const { getFacility, approveRecommendation } = useApi();
+  const [loading, setLoading] = useState(false);
+
+  let tagBg = 'bg-sky-50 text-sky-700';
   let tagLabel = 'Redistribute';
+  let TagIcon = ArrowRightLeft;
 
   if (rec.type === 'expedite') {
     TagIcon = Clock;
-    tagClass = 'bg-amber-50 text-amber-700 border-amber-200';
+    tagBg = 'bg-amber-50 text-amber-700';
     tagLabel = 'Expedite Order';
   } else if (rec.type === 'escalate') {
     TagIcon = Flag;
-    tagClass = 'bg-rose-50 text-rose-700 border-rose-200';
-    tagLabel = 'Escalate to Ministry';
+    tagBg = 'bg-rose-50 text-rose-700';
+    tagLabel = 'Escalate';
   }
 
   const fromFac = rec.from_facility_id ? getFacility(rec.from_facility_id)?.name.split(' ')[0] ?? 'Hub' : '';
   const toFac = getFacility(rec.to_facility_id)?.name.split(' ')[0] ?? 'Target';
 
+  const handleApprove = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setLoading(true);
+    await approveRecommendation(rec); // removes card + calls backend
+    onApprove(`${tagLabel}: ${rec.medicine_name}`); // triggers toast
+    // no need to setLoading(false) — card unmounts after approve
+  };
+
   return (
-    <div className="bg-white rounded-xl p-3.5 border border-slate-200 shadow-xs hover:border-slate-300 transition group">
-      <div className="flex items-center justify-between gap-2">
-        <span className={`inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border ${tagClass}`}>
+    <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+      {/* Header bar (Criticality / Urgency) */}
+      <div className="flex items-center justify-between gap-2 mb-2">
+        <span className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full ${tagBg}`}>
           <TagIcon className="w-3 h-3" />
           {tagLabel}
         </span>
-
-        <div className="flex items-center gap-1.5" title={`Priority ranking score: ${rec.priority_score}/100`}>
-          <span className="text-[11px] font-mono font-semibold text-slate-700">P-{rec.priority_score}</span>
-          <div className="w-12 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+        {/* Urgency bar */}
+        <div
+          className="flex items-center gap-1.5 cursor-help"
+          title={`Urgency score: ${rec.priority_score}/100. Higher = closer to stockout.`}
+        >
+          <div className="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
             <div
-              className={`h-full ${rec.priority_score > 90 ? 'bg-rose-500' : 'bg-sky-500'}`}
+              className={`h-full rounded-full ${rec.priority_score > 90 ? 'bg-rose-500' : 'bg-sky-400'}`}
               style={{ width: `${rec.priority_score}%` }}
             />
           </div>
+          <span className="text-[11px] font-mono text-slate-500">{rec.priority_score}</span>
         </div>
       </div>
 
-      <h4 className="text-xs font-semibold text-slate-900 mt-2">{rec.medicine_name}</h4>
-      <p className="text-xs text-slate-600 mt-1 leading-snug">{rec.priority_reason}</p>
+      {/* Medicine + reason */}
+      <p className="text-sm font-semibold text-slate-900">{rec.medicine_name}</p>
+      <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{rec.priority_reason}</p>
 
+      {/* Transfer details */}
       {rec.type === 'redistribution' && (
-        <div className="mt-2 p-2 bg-slate-50 rounded-lg border border-slate-200/80 text-xs flex items-center justify-between font-mono">
-          <div className="flex items-center gap-1 text-slate-700">
-            <span className="font-semibold text-slate-900">{rec.suggested_quantity} units</span>
-            <span className="text-slate-400">•</span>
-            <span>{fromFac} → {toFac}</span>
-          </div>
-          <span className="text-[10px] text-slate-500 font-sans flex items-center gap-1">
-            <Navigation className="w-2.5 h-2.5 text-sky-600" /> {rec.travel_time_minutes}m drive
+        <div className="mt-3 flex items-center justify-between px-3 py-2 bg-slate-50 rounded-lg border border-slate-100 text-xs">
+          <span className="font-medium text-slate-800">
+            {rec.suggested_quantity} units · {fromFac} → {toFac}
+          </span>
+          <span className="flex items-center gap-1 text-slate-400">
+            <Navigation className="w-3 h-3" />
+            {rec.travel_time_minutes}m
           </span>
         </div>
       )}
 
-      <div className="mt-2.5 pt-2 flex items-center justify-between border-t border-slate-100">
+      {/* Actions */}
+      <div className="mt-3 pt-3 flex items-center justify-between border-t border-slate-100">
         <button
-          onClick={() => onInspect(rec.to_facility_id, rec.medicine_id)}
-          className="text-[11px] text-slate-500 hover:text-slate-800 font-medium transition"
+          onClick={(e) => { e.stopPropagation(); onInspect(rec.to_facility_id, rec.medicine_id); }}
+          className="text-xs font-medium text-slate-500 hover:text-slate-800 border border-slate-200 hover:border-slate-300 px-3 py-1.5 rounded-lg transition"
         >
-          Inspect Target
+          View Facility
         </button>
+
         <button
-          onClick={() => onApprove(`${tagLabel}: ${rec.medicine_name}`)}
-          className="text-[11px] font-semibold text-sky-600 hover:text-sky-700 hover:underline flex items-center gap-1"
+          onClick={handleApprove}
+          disabled={loading}
+          className="text-xs font-semibold text-white bg-slate-900 hover:bg-slate-700 disabled:opacity-60 px-3 py-1.5 rounded-lg transition flex items-center gap-1.5"
         >
-          Approve Action <ArrowRight className="w-3 h-3" />
+          {loading ? (
+            <><Loader2 className="w-3 h-3 animate-spin" /> Approving…</>
+          ) : (
+            <><Check className="w-3 h-3" /> Approve</>
+          )}
         </button>
       </div>
     </div>

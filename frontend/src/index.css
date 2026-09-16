@@ -28,3 +28,11 @@ body {
 .custom-pill {
   font-variant-numeric: tabular-nums;
 }
+
+/* Rich, visible background for a modern medical/storage look */
+.bg-medical-theme {
+  background-color: #f8fafc;
+  background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+  background-size: 32px 32px;
+  position: relative;
+}

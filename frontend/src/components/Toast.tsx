@@ -1,4 +1,5 @@
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface ToastProps {
   title: string;
@@ -7,19 +8,36 @@ interface ToastProps {
 }
 
 export default function Toast({ title, body, visible }: ToastProps) {
+  const [dismissed, setDismissed] = useState(false);
+
+  // Reset dismissed whenever a new toast appears
+  useEffect(() => {
+    if (visible) setDismissed(false);
+  }, [visible, title]);
+
+  const show = visible && !dismissed;
+
   return (
     <div
-      className={`fixed bottom-6 right-6 z-[60] transform transition-all duration-300 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl border border-slate-800 flex items-center gap-3 ${
-        visible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'
+      role="alert"
+      aria-live="polite"
+      className={`fixed bottom-6 right-6 z-[9999] flex items-start gap-3 w-80 bg-white border border-slate-200 rounded-xl shadow-xl px-4 py-3.5 transform transition-all duration-300 ${
+        show ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0 pointer-events-none'
       }`}
     >
-      <div className="p-1 rounded bg-emerald-500/20 text-emerald-400">
+      <div className="p-1.5 rounded-lg bg-emerald-100 text-emerald-600 shrink-0 mt-0.5">
         <CheckCircle2 className="w-4 h-4" />
       </div>
-      <div>
-        <p className="text-xs font-semibold">{title}</p>
-        <p className="text-[11px] text-slate-400">{body}</p>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-semibold text-slate-800">{title}</p>
+        {body && <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{body}</p>}
       </div>
+      <button
+        onClick={() => setDismissed(true)}
+        className="text-slate-300 hover:text-slate-500 shrink-0 mt-0.5 transition"
+      >
+        <X className="w-4 h-4" />
+      </button>
     </div>
   );
 }

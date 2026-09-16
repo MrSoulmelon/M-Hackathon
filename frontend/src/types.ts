@@ -40,7 +40,8 @@ export interface Alert {
   district: string;
   supplier_id: string;
   medicine_id: string;
-  medicine_name: string;
+  medicine_name?: string;
+  medicine_ids?: string[];
   affected_facilities: string[];
   pct_facilities_amber_or_red: number;
   diagnosis: 'supplier_delay' | 'demand_spike' | 'mixed';
