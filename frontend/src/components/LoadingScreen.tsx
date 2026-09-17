@@ -108,7 +108,7 @@ export const LoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
           <h1 
             className="text-7xl md:text-8xl lg:text-[10rem] font-serif italic font-bold uppercase translate-y-[25vh] scale-110"
             style={{
-              color: 'rgba(167, 139, 250, 0.7)',
+              color: '#ffffff',
               textShadow: '-6px 0px 0px rgba(56,189,248,0.9), 6px 0px 0px rgba(192,38,211,0.9)',
               letterSpacing: '0.02em'
             }}

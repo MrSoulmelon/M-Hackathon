@@ -168,10 +168,10 @@ export function AdminDashboard() {
                   {filteredFacilities.length}
                 </span>
               </h2>
-              <div className="flex items-center gap-3 text-[11px] font-medium text-slate-500">
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500" />Healthy</span>
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-500" />At-Risk</span>
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-rose-500" />Critical</span>
+              <div className="flex items-center gap-5 text-sm font-semibold text-slate-300">
+                <span className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-sky-500" />Healthy</span>
+                <span className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-violet-500" />At-Risk</span>
+                <span className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-fuchsia-500" />Critical</span>
               </div>
             </div>
 
@@ -209,7 +209,7 @@ export function AdminDashboard() {
               <section className="space-y-3">
                 <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-widest flex items-center justify-between">
                   <span>Priority Alerts</span>
-                  <span className="text-rose-500 font-bold bg-rose-950 px-1.5 py-0.5 rounded text-[10px]">{alerts.length} Active</span>
+                  <span className="text-fuchsia-500 font-bold bg-fuchsia-950 px-1.5 py-0.5 rounded text-[10px]">{alerts.length} Active</span>
                 </h2>
                 
                 <div className="space-y-3">

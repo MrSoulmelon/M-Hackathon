@@ -62,7 +62,7 @@ export default function Header({ district, setDistrict, criticality, setCritical
               <span 
                 className="text-2xl font-serif italic font-bold uppercase"
                 style={{
-                  color: 'rgba(167, 139, 250, 0.7)',
+                  color: '#ffffff',
                   textShadow: '-2px 0px 0px rgba(56,189,248,0.9), 2px 0px 0px rgba(192,38,211,0.9)',
                   letterSpacing: '0.02em'
                 }}
@@ -84,7 +84,7 @@ export default function Header({ district, setDistrict, criticality, setCritical
           title="Refresh live telemetry"
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-sky-800 bg-slate-900 hover:bg-slate-900 text-xs font-medium text-slate-500 transition shadow-sm"
         >
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse" />
           <span className="hidden sm:inline text-slate-500 font-mono text-[11px]">Live</span>
           <RefreshCw className={`w-3.5 h-3.5 text-slate-500 ${syncing ? 'animate-spin' : ''}`} />
         </button>

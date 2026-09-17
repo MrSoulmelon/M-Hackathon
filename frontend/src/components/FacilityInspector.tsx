@@ -82,13 +82,13 @@ export default function FacilityInspector({ facility, initialMedicineId, onClose
   }, [facility.facility_id, selectedMedicineId, getChartData, currentScore]);
 
   // Risk badge
-  let riskBadgeClass = 'bg-emerald-900 text-emerald-800 border-emerald-800';
+  let riskBadgeClass = 'bg-sky-900 text-sky-800 border-sky-800';
   let riskBadgeText = 'Optimal Buffer Level';
   if (currentScore.risk_level === 'red') {
-    riskBadgeClass = 'bg-rose-900 text-rose-200 border-rose-800';
+    riskBadgeClass = 'bg-fuchsia-900 text-fuchsia-200 border-fuchsia-800';
     riskBadgeText = 'Critical Risk Level';
   } else if (currentScore.risk_level === 'amber') {
-    riskBadgeClass = 'bg-amber-900 text-amber-800 border-amber-800';
+    riskBadgeClass = 'bg-violet-900 text-violet-800 border-violet-800';
     riskBadgeText = 'At-Risk Level';
   }
 
@@ -100,10 +100,10 @@ export default function FacilityInspector({ facility, initialMedicineId, onClose
   let trendIconClass = 'text-slate-500';
   if (currentScore.signals.consumption_trend === 'rising') {
     trendValue = 'Surging (+38%)';
-    trendClass = 'text-sm font-bold text-rose-300 capitalize';
+    trendClass = 'text-sm font-bold text-fuchsia-300 capitalize';
     trendDesc = 'Spike in patient prescriptions over trailing 7-day window.';
     TrendIcon = TrendingUp;
-    trendIconClass = 'text-rose-500';
+    trendIconClass = 'text-fuchsia-500';
   } else if (currentScore.signals.consumption_trend === 'falling') {
     trendValue = 'Decreasing (-12%)';
     trendClass = 'text-sm font-bold text-slate-300 capitalize';
@@ -117,32 +117,32 @@ export default function FacilityInspector({ facility, initialMedicineId, onClose
   let replClass = 'text-sm font-bold text-emerald-700 capitalize';
   let replDesc = 'Regular bi-weekly delivery expected on standard timetable.';
   let ReplIcon = Clock;
-  let replIconClass = 'text-emerald-500';
+  let replIconClass = 'text-sky-500';
   if (currentScore.signals.replenishment_status === 'overdue') {
     replValue = `Overdue (${currentScore.signals.replenishment_delay_days} days)`;
-    replClass = 'text-sm font-bold text-rose-300 capitalize';
+    replClass = 'text-sm font-bold text-fuchsia-300 capitalize';
     replDesc = `Supplier PO order has breached SLA delivery window by ${currentScore.signals.replenishment_delay_days} days.`;
-    replIconClass = 'text-rose-500';
+    replIconClass = 'text-fuchsia-500';
   } else if (currentScore.signals.replenishment_status === 'delayed') {
     replValue = `Delayed (${currentScore.signals.replenishment_delay_days} days)`;
-    replClass = 'text-sm font-bold text-amber-700 capitalize';
+    replClass = 'text-sm font-bold text-violet-700 capitalize';
     replDesc = 'Transit shipment flagged with logistics delay at central depot.';
-    replIconClass = 'text-amber-500';
+    replIconClass = 'text-violet-500';
   }
 
   // Signal: Anomaly
   const anom = currentScore.signals.consumption_anomaly_score;
   let anomClass = 'text-sm font-bold text-emerald-700 font-mono';
   let anomDesc = 'Normal distribution: minimal variance detected.';
-  let anomIconClass = 'text-emerald-500';
+  let anomIconClass = 'text-sky-500';
   if (anom > 0.7) {
-    anomClass = 'text-sm font-bold text-rose-300 font-mono';
+    anomClass = 'text-sm font-bold text-fuchsia-300 font-mono';
     anomDesc = 'High divergence anomaly: exceeds 2.5 standard deviations.';
-    anomIconClass = 'text-rose-500';
+    anomIconClass = 'text-fuchsia-500';
   } else if (anom > 0.4) {
-    anomClass = 'text-sm font-bold text-amber-700 font-mono';
+    anomClass = 'text-sm font-bold text-violet-700 font-mono';
     anomDesc = 'Moderate variance: slight divergence from forecast.';
-    anomIconClass = 'text-amber-500';
+    anomIconClass = 'text-violet-500';
   }
 
   const stockoutDay = currentScore.risk_level === 'red' ? currentScore.days_of_supply : currentScore.risk_level === 'amber' ? currentScore.days_of_supply : null;
@@ -196,9 +196,9 @@ export default function FacilityInspector({ facility, initialMedicineId, onClose
                 const days = s?.days_of_supply ?? 30;
                 const isSelected = med.medicine_id === selectedMedicineId;
 
-                let dotColor = 'bg-emerald-500';
-                if (risk === 'red') dotColor = 'bg-rose-500';
-                else if (risk === 'amber') dotColor = 'bg-amber-500';
+                let dotColor = 'bg-sky-500';
+                if (risk === 'red') dotColor = 'bg-fuchsia-500';
+                else if (risk === 'amber') dotColor = 'bg-violet-500';
 
                 const selectedStyle = isSelected
                   ? 'ring-2 ring-sky-500 bg-slate-900/50 border-sky-700'
@@ -252,11 +252,11 @@ export default function FacilityInspector({ facility, initialMedicineId, onClose
                     </div>
                   </div>
                   <div className="text-[11px] text-slate-500 mt-1">
-                    Est. Stockout: <span className="font-medium text-rose-400 font-mono">~{currentScore.projected_stockout_date} (predicted)</span>
+                    Est. Stockout: <span className="font-medium text-fuchsia-400 font-mono">~{currentScore.projected_stockout_date} (predicted)</span>
                   </div>
                   <button 
                     onClick={() => setShowHistory(true)}
-                    className="mt-2 px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-300 text-xs rounded transition"
+                    className="mt-2 px-3 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 hover:text-white text-xs font-medium rounded transition"
                   >
                     View History
                   </button>
@@ -276,7 +276,7 @@ export default function FacilityInspector({ facility, initialMedicineId, onClose
                     <span className="w-2.5 h-0.5 bg-sky-500 inline-block" /> Actual
                   </span>
                   <span className="flex items-center gap-1 text-slate-500">
-                    <span className="w-2.5 h-0.5 border-t-2 border-dashed border-rose-500 inline-block" /> Projected
+                    <span className="w-2.5 h-0.5 border-t-2 border-dashed border-fuchsia-500 inline-block" /> Projected
                   </span>
                   <span className="flex items-center gap-1 text-slate-500">
                     <span className="w-2 h-2 rounded-full bg-slate-400 inline-block" /> Today
@@ -350,7 +350,7 @@ export default function FacilityInspector({ facility, initialMedicineId, onClose
                 <span>-10d</span>
                 <span>-5d</span>
                 <span className="font-bold text-slate-300">Today</span>
-                <span className="text-rose-400 font-bold">+5d</span>
+                <span className="text-fuchsia-400 font-bold">+5d</span>
                 <span>+10d</span>
               </div>
             </div>

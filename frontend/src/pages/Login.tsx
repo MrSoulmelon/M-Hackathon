@@ -72,7 +72,7 @@ export const Login: React.FC = () => {
           <span 
             className="text-5xl font-serif italic font-bold uppercase"
             style={{
-              color: 'rgba(167, 139, 250, 0.7)',
+              color: '#ffffff',
               textShadow: '-3px 0px 0px rgba(56,189,248,0.9), 3px 0px 0px rgba(192,38,211,0.9)',
               letterSpacing: '0.02em'
             }}
@@ -118,7 +118,7 @@ export const Login: React.FC = () => {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
-              <div className="p-3 bg-rose-950 border border-rose-800 text-rose-400 text-sm rounded-lg font-medium text-center">
+              <div className="p-3 bg-fuchsia-950 border border-fuchsia-800 text-fuchsia-400 text-sm rounded-lg font-medium text-center">
                 {error}
               </div>
             )}

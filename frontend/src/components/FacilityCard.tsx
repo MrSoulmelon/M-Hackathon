@@ -12,19 +12,19 @@ export default function FacilityCard({ facility, onClick, highlighted = false }:
   const { getFacilitySummary, riskScores, medicines } = useApi();
   const summary = getFacilitySummary(facility.facility_id);
 
-  let borderClass = 'border-l-4 border-l-emerald-500 hover:border-emerald-600';
-  let badgeClass = 'bg-emerald-950 text-emerald-400 border-emerald-800';
+  let borderClass = 'border-l-4 border-l-sky-500 hover:border-sky-600';
+  let badgeClass = 'bg-sky-950 text-sky-400 border-sky-800';
   let badgeText = 'Stable';
   let StatusIcon = Check;
 
   if (summary.worstRisk === 'red') {
-    borderClass = 'border-l-4 border-l-rose-500 hover:border-rose-600 ring-1 ring-rose-200/50';
-    badgeClass = 'bg-rose-950 text-rose-300 border-rose-800 font-semibold';
+    borderClass = 'border-l-4 border-l-fuchsia-500 hover:border-fuchsia-600 ring-1 ring-fuchsia-200/50';
+    badgeClass = 'bg-fuchsia-950 text-fuchsia-300 border-fuchsia-800 font-semibold';
     badgeText = `${summary.atRiskCount} at risk`;
     StatusIcon = AlertOctagon;
   } else if (summary.worstRisk === 'amber') {
-    borderClass = 'border-l-4 border-l-amber-500 hover:border-amber-600';
-    badgeClass = 'bg-amber-950 text-amber-400 border-amber-800 font-medium';
+    borderClass = 'border-l-4 border-l-violet-500 hover:border-violet-600';
+    badgeClass = 'bg-violet-950 text-violet-400 border-violet-800 font-medium';
     badgeText = `${summary.atRiskCount} at risk`;
     StatusIcon = AlertTriangle;
   }
@@ -44,8 +44,8 @@ export default function FacilityCard({ facility, onClick, highlighted = false }:
         <div className="space-y-0.5">
           <div className="flex items-center gap-1.5">
             <span className="text-[10px] font-medium uppercase tracking-wider text-slate-500">{facility.type}</span>
-            <span className="text-slate-300">•</span>
-            <span className="text-xs text-slate-500 font-medium">{facility.district}</span>
+            <span className="text-slate-500">•</span>
+            <span className="text-xs text-white/70 font-semibold">{facility.district}</span>
           </div>
           <h3 className="text-sm font-semibold text-white group-hover:text-sky-400 transition-colors">{facility.name}</h3>
         </div>
@@ -59,7 +59,7 @@ export default function FacilityCard({ facility, onClick, highlighted = false }:
         <div className="overflow-hidden mr-2">
           {riskItem ? (
             <span className="text-[11px] text-slate-500 truncate block">
-              Critical: <strong className={riskItem.risk_level === 'red' ? 'text-rose-400' : 'text-amber-600'}>{(medicines.find(m => m.medicine_id === riskItem.medicine_id)?.name || riskItem.medicine_name || 'Unknown').split(' ')[0]}</strong> ({riskItem.days_of_supply}d supply left)
+              Critical: <strong className={riskItem.risk_level === 'red' ? 'text-fuchsia-400' : 'text-violet-400'}>{(medicines.find(m => m.medicine_id === riskItem.medicine_id)?.name || riskItem.medicine_name || 'Unknown').split(' ')[0]}</strong> ({riskItem.days_of_supply}d supply left)
             </span>
           ) : (
             <span className="text-[11px] text-slate-500 block">All 8 monitored medicines stable</span>

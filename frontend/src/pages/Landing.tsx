@@ -107,7 +107,7 @@ export const Landing = () => {
             isAnimating ? 'translate-y-[25vh] scale-110' : 'translate-y-0 scale-100 mb-4'
           }`}
           style={{
-            color: 'rgba(167, 139, 250, 0.7)',
+            color: '#ffffff',
             textShadow: '-6px 0px 0px rgba(56,189,248,0.9), 6px 0px 0px rgba(192,38,211,0.9)',
             letterSpacing: '0.02em'
           }}
@@ -122,12 +122,26 @@ export const Landing = () => {
               AI-Powered <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">Supply Chain Triage</span>
             </h2>
             
-            <p className="text-sm md:text-base lg:text-lg text-slate-400 max-w-2xl mx-auto mb-16 leading-relaxed font-medium reveal-element" style={{ animationDelay: '0.2s' }}>
+            <p className="text-sm md:text-base lg:text-lg text-slate-400 max-w-2xl mx-auto mb-8 leading-relaxed font-medium reveal-element" style={{ animationDelay: '0.2s' }}>
               Detect systemic medicine shortages before they happen. Predict local demand spikes, reroute critical stock, and keep health systems running smoothly.
             </p>
 
+            <div className="mb-12 reveal-element flex justify-center" style={{ animationDelay: '0.4s' }}>
+              <Link 
+                to="/login"
+                className="inline-flex items-center gap-4 bg-slate-900/90 backdrop-blur-xl pr-10 pl-5 py-4 rounded-2xl border border-slate-700/80 hover:border-blue-500/80 hover:bg-slate-800 transition-all shadow-xl group"
+              >
+                <div className="bg-blue-950 p-3 rounded-xl border border-blue-900/80 group-hover:bg-blue-600/50 transition-colors">
+                  <LogIn className="w-5 h-5 text-blue-400 group-hover:text-white transition-colors" />
+                </div>
+                <span className="font-bold uppercase tracking-widest text-sm text-slate-100 group-hover:text-white transition-colors">
+                  Sign In
+                </span>
+              </Link>
+            </div>
+
             {/* Feature Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full text-left reveal-element" style={{ animationDelay: '0.4s' }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full text-left reveal-element" style={{ animationDelay: '0.6s' }}>
               
               <div className="flex items-center gap-4 bg-slate-900/50 backdrop-blur-xl p-5 rounded-2xl border border-slate-700/50 hover:border-blue-500/50 hover:bg-slate-800/80 transition-all shadow-xl group">
                 <div className="bg-blue-950/80 p-3.5 rounded-xl border border-blue-900/50 group-hover:bg-blue-600/20 transition-colors">
@@ -159,9 +173,9 @@ export const Landing = () => {
                 </div>
               </div>
 
-              <div className="flex items-center gap-4 bg-slate-900/50 backdrop-blur-xl p-5 rounded-2xl border border-slate-700/50 hover:border-emerald-500/50 hover:bg-slate-800/80 transition-all shadow-xl group">
-                <div className="bg-emerald-950/80 p-3.5 rounded-xl border border-emerald-900/50 group-hover:bg-emerald-600/20 transition-colors">
-                  <svg className="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="flex items-center gap-4 bg-slate-900/50 backdrop-blur-xl p-5 rounded-2xl border border-slate-700/50 hover:border-sky-500/50 hover:bg-slate-800/80 transition-all shadow-xl group">
+                <div className="bg-sky-950/80 p-3.5 rounded-xl border border-sky-900/50 group-hover:bg-sky-600/20 transition-colors">
+                  <svg className="w-5 h-5 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </div>
@@ -172,15 +186,6 @@ export const Landing = () => {
               </div>
 
             </div>
-            
-            <div className="mt-12 reveal-element" style={{ animationDelay: '0.6s' }}>
-              <Link 
-                to="/login"
-                className="inline-flex items-center gap-2 px-10 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-full font-bold uppercase tracking-widest text-sm shadow-[0_0_30px_rgba(37,99,235,0.4)] hover:shadow-[0_0_50px_rgba(37,99,235,0.7)] transition-all"
-              >
-                Sign In <LogIn className="w-5 h-5 ml-2" />
-              </Link>
-            </div>
           </>
         )}
 
@@ -188,9 +193,9 @@ export const Landing = () => {
         {isAnimating && (
           <div className="opacity-0 pointer-events-none select-none" aria-hidden="true">
             <h2 className="text-2xl md:text-4xl font-extrabold tracking-tight mb-6 mt-4">AI-Powered</h2>
-            <p className="text-sm md:text-base lg:text-lg max-w-2xl mx-auto mb-16">Detect systemic medicine shortages before they happen.</p>
+            <p className="text-sm md:text-base lg:text-lg max-w-2xl mx-auto mb-8">Detect systemic medicine shortages before they happen.</p>
+            <div className="mb-12 flex justify-center"><button className="py-4">Sign In</button></div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full h-[200px]"></div>
-            <div className="mt-12"><button className="px-10 py-4">Sign In</button></div>
           </div>
         )}
 

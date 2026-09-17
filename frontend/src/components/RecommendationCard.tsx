@@ -19,11 +19,11 @@ export default function RecommendationCard({ rec, onInspect, onApprove }: Recomm
 
   if (rec.type === 'expedite') {
     TagIcon = Clock;
-    tagBg = 'bg-amber-950 text-amber-700';
+    tagBg = 'bg-violet-950 text-violet-700';
     tagLabel = 'Expedite Order';
   } else if (rec.type === 'escalate') {
     TagIcon = Flag;
-    tagBg = 'bg-rose-950 text-rose-300';
+    tagBg = 'bg-fuchsia-950 text-fuchsia-300';
     tagLabel = 'Escalate';
   }
 
@@ -53,7 +53,7 @@ export default function RecommendationCard({ rec, onInspect, onApprove }: Recomm
         >
           <div className="w-16 h-1.5 bg-slate-800 rounded-full overflow-hidden">
             <div
-              className={`h-full rounded-full ${rec.priority_score > 90 ? 'bg-rose-500' : 'bg-sky-400'}`}
+              className={`h-full rounded-full ${rec.priority_score > 90 ? 'bg-fuchsia-500' : 'bg-sky-400'}`}
               style={{ width: `${rec.priority_score}%` }}
             />
           </div>

@@ -23,8 +23,8 @@ export default function RecommendationsView({ onInspect, onApprove }: Recommenda
         Recommendations are prioritised by stockout urgency, travel time, and available buffer stock — sorted highest risk first.
         <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-700 text-[11px]">
           <span>Latency: <span className="font-mono text-slate-200">18ms</span></span>
-          <span className="text-emerald-400 flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> 99.4% uptime
+          <span className="text-sky-400 flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-sky-400" /> 99.4% uptime
           </span>
         </div>
       </div>

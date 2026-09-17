@@ -33,7 +33,7 @@ export const Register: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="max-w-md w-full p-6 bg-slate-900 rounded-lg shadow-md">
         <h2 className="text-2xl font-bold mb-6 text-center">Register</h2>
-        {error && <div className="mb-4 text-red-500 text-sm text-center">{error}</div>}
+        {error && <div className="mb-4 text-fuchsia-500 text-sm text-center">{error}</div>}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">Email</label>

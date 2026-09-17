@@ -37,6 +37,15 @@ function App() {
   // or if they are already authenticated and going to a dashboard.
   const isRoot = location.pathname === '/';
 
+  useEffect(() => {
+    // If we land on root, Landing.tsx handles its own intro sequence.
+    // We clear the global loading state so it doesn't trigger later
+    // when navigating to /login.
+    if (isRoot) {
+      setShowLoading(false);
+    }
+  }, []);
+
   return (
     <>
       <Routes>

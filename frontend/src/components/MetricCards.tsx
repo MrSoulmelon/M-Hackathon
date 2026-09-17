@@ -40,30 +40,30 @@ export default function MetricCards({ onRiskCardClick }: MetricCardsProps) {
           <div className="p-1.5 rounded-md bg-slate-800 text-slate-500">
             <Building2 className="w-4 h-4" />
           </div>
-          <span className="text-xs font-medium text-slate-500">Monitored Facilities</span>
+          <span className="text-xs font-semibold text-white">Monitored Facilities</span>
         </div>
-        <span className="text-3xl font-bold text-slate-200 font-mono">{totalFacilities}</span>
-        <p className="text-[11px] text-slate-500 mt-1.5">Across {districts} districts · {popStr} pop.</p>
+        <span className="text-3xl font-bold text-white font-mono">{totalFacilities}</span>
+        <p className="text-[11px] text-white/70 font-medium mt-1.5">Across {districts} districts · {popStr} pop.</p>
       </div>
 
       {/* Clickable — Facilities At Risk */}
       <button
         onClick={onRiskCardClick}
-        className="bg-slate-900 rounded-xl p-4 border-2 border-amber-900/50 text-left hover:border-amber-600 hover:shadow-md transition-all group"
+        className="bg-slate-900 rounded-xl p-4 border-2 border-violet-900/50 text-left hover:border-violet-600 hover:shadow-md transition-all group"
         title="Click to view at-risk facilities"
       >
         <div className="flex items-center gap-2 mb-3">
-          <div className="p-1.5 rounded-md bg-amber-950 text-amber-500 group-hover:bg-amber-600 group-hover:text-white transition-colors">
+          <div className="p-1.5 rounded-md bg-violet-950 text-violet-500 group-hover:bg-violet-600 group-hover:text-white transition-colors">
             <AlertTriangle className="w-4 h-4" />
           </div>
-          <span className="text-xs font-semibold text-amber-400">Facilities At Risk</span>
+          <span className="text-xs font-semibold text-white">Facilities At Risk</span>
         </div>
         <div className="flex items-baseline gap-2">
-          <span className="text-3xl font-bold text-amber-400 font-mono">{atRiskCount}</span>
-          <span className="text-xs font-medium text-rose-400 bg-rose-950 px-1.5 py-0.5 rounded-full border border-rose-800">{criticalCount} critical</span>
+          <span className="text-3xl font-bold text-white font-mono">{atRiskCount}</span>
+          <span className="text-xs font-medium text-fuchsia-400 bg-fuchsia-950 px-1.5 py-0.5 rounded-full border border-fuchsia-800">{criticalCount} critical</span>
         </div>
-        <div className="flex items-center gap-1 mt-1.5 text-[11px] text-amber-500">
-          <Clock className="w-3 h-3" />
+        <div className="flex items-center gap-1 mt-1.5 text-[11px] text-white/70 font-medium">
+          <Clock className="w-3 h-3 text-violet-500" />
           <span>Real-time tracking active</span>
         </div>
       </button>
@@ -71,17 +71,17 @@ export default function MetricCards({ onRiskCardClick }: MetricCardsProps) {
       {/* Systemic Alerts */}
       <div className="bg-slate-900 rounded-xl p-4 border border-slate-800">
         <div className="flex items-center gap-2 mb-3">
-          <div className="p-1.5 rounded-md bg-rose-950 text-rose-500">
+          <div className="p-1.5 rounded-md bg-fuchsia-950 text-fuchsia-500">
             <Radio className="w-4 h-4 animate-pulse" />
           </div>
-          <span className="text-xs font-medium text-slate-500">Active Alerts</span>
+          <span className="text-xs font-semibold text-white">Active Alerts</span>
         </div>
         <div className="flex items-baseline gap-2">
-          <span className="text-3xl font-bold text-slate-200 font-mono">{totalAlerts}</span>
-          {localAnomalies > 0 && <span className="text-xs text-slate-500">+ {localAnomalies} local anomaly</span>}
+          <span className="text-3xl font-bold text-white font-mono">{totalAlerts}</span>
+          {localAnomalies > 0 && <span className="text-xs text-white/70 font-medium">+ {localAnomalies} local anomaly</span>}
         </div>
-        <div className="flex items-center gap-1 mt-1.5 text-[11px] text-slate-500">
-          <Truck className="w-3 h-3" />
+        <div className="flex items-center gap-1 mt-1.5 text-[11px] text-white/70 font-medium">
+          <Truck className="w-3 h-3 text-fuchsia-500" />
           <span>Monitoring supply chain</span>
         </div>
       </div>
@@ -92,14 +92,14 @@ export default function MetricCards({ onRiskCardClick }: MetricCardsProps) {
           <div className="p-1.5 rounded-md bg-slate-900 text-sky-500">
             <GitPullRequest className="w-4 h-4" />
           </div>
-          <span className="text-xs font-medium text-slate-500">AI Recommendations</span>
+          <span className="text-xs font-semibold text-white">AI Recommendations</span>
         </div>
         <div className="flex items-baseline gap-2">
-          <span className="text-3xl font-bold text-slate-200 font-mono">{totalRecommendations}</span>
+          <span className="text-3xl font-bold text-white font-mono">{totalRecommendations}</span>
           <span className="text-xs text-sky-400 font-medium bg-slate-900 px-1.5 py-0.5 rounded-full border border-sky-800">Actionable</span>
         </div>
-        <div className="flex items-center gap-1 mt-1.5 text-[11px] text-slate-500">
-          <ArrowRightLeft className="w-3 h-3" />
+        <div className="flex items-center gap-1 mt-1.5 text-[11px] text-white/70 font-medium">
+          <ArrowRightLeft className="w-3 h-3 text-sky-500" />
           <span>{redistributions} redistributions ready</span>
         </div>
       </div>

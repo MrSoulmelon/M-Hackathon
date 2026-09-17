@@ -138,8 +138,8 @@ export const SupplierDashboard: React.FC = () => {
                     <td className="p-4 px-6 font-medium">{item.expected_date}</td>
                     <td className="p-4 px-6">
                       <span className={`px-2.5 py-1 rounded-lg text-[11px] uppercase tracking-wider font-bold border ${
-                        item.status === 'delivered' ? 'bg-emerald-950 text-emerald-700 border-emerald-800' :
-                        item.status === 'delayed' ? 'bg-amber-950 text-amber-700 border-amber-800' :
+                        item.status === 'delivered' ? 'bg-sky-950 text-emerald-700 border-sky-800' :
+                        item.status === 'delayed' ? 'bg-violet-950 text-violet-700 border-violet-800' :
                         'bg-blue-950 text-blue-400 border-blue-800'
                       }`}>
                         {item.status}
@@ -151,14 +151,14 @@ export const SupplierDashboard: React.FC = () => {
                           {item.status !== 'delayed' && (
                             <button 
                               onClick={() => handleUpdateStatus(item.id, 'delayed', item.expected_date)}
-                              className="text-amber-700 hover:text-white font-semibold text-[11px] uppercase tracking-wider px-3 py-1.5 border border-amber-800 hover:border-amber-600 bg-slate-900 hover:bg-amber-600 rounded-lg transition shadow-sm"
+                              className="text-violet-700 hover:text-white font-semibold text-[11px] uppercase tracking-wider px-3 py-1.5 border border-violet-800 hover:border-violet-600 bg-slate-900 hover:bg-violet-600 rounded-lg transition shadow-sm"
                             >
                               Report Delay
                             </button>
                           )}
                           <button 
                             onClick={() => handleUpdateStatus(item.id, 'delivered', item.expected_date)}
-                            className="text-emerald-700 hover:text-white font-semibold text-[11px] uppercase tracking-wider px-3 py-1.5 border border-emerald-800 hover:border-emerald-600 bg-slate-900 hover:bg-emerald-600 rounded-lg transition shadow-sm"
+                            className="text-emerald-700 hover:text-white font-semibold text-[11px] uppercase tracking-wider px-3 py-1.5 border border-sky-800 hover:border-sky-600 bg-slate-900 hover:bg-sky-600 rounded-lg transition shadow-sm"
                           >
                             Delivered
                           </button>

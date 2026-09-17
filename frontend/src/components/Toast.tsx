@@ -25,7 +25,7 @@ export default function Toast({ title, body, visible }: ToastProps) {
         show ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0 pointer-events-none'
       }`}
     >
-      <div className="p-1.5 rounded-lg bg-emerald-900 text-emerald-600 shrink-0 mt-0.5">
+      <div className="p-1.5 rounded-lg bg-sky-900 text-sky-600 shrink-0 mt-0.5">
         <CheckCircle2 className="w-4 h-4" />
       </div>
       <div className="flex-1 min-w-0">
