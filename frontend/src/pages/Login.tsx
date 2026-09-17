@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Activity, ShieldCheck, Map, ArrowRight } from 'lucide-react';
@@ -8,8 +8,17 @@ export const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   const handleLogin = async (loginEmail = email, loginPassword = password) => {
     setIsLoading(true);
@@ -57,12 +66,43 @@ export const Login: React.FC = () => {
 
   return (
     <div className="min-h-screen flex bg-medical-theme relative overflow-hidden font-sans">
-      {/* Animated background orbs covering the whole page */}
-      <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-500 rounded-full mix-blend-screen filter blur-[100px] opacity-40 animate-[pulse_5s_ease-in-out_infinite] pointer-events-none"></div>
-      <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-teal-400 rounded-full mix-blend-screen filter blur-[120px] opacity-30 animate-[pulse_6s_ease-in-out_infinite] pointer-events-none" style={{ animationDelay: '1s' }}></div>
-      <div className="absolute top-[30%] right-[10%] w-[400px] h-[400px] bg-cyan-400 rounded-full mix-blend-screen filter blur-[90px] opacity-30 animate-[pulse_7s_ease-in-out_infinite] pointer-events-none" style={{ animationDelay: '2s' }}></div>
-      <div className="absolute bottom-[20%] left-[10%] w-[350px] h-[350px] bg-indigo-500 rounded-full mix-blend-screen filter blur-[100px] opacity-35 animate-[pulse_4s_ease-in-out_infinite] pointer-events-none" style={{ animationDelay: '3s' }}></div>
-      <div className="absolute top-[50%] left-[50%] w-[600px] h-[600px] -translate-x-1/2 -translate-y-1/2 bg-blue-600 rounded-full mix-blend-screen filter blur-[150px] opacity-20 animate-[pulse_8s_ease-in-out_infinite] pointer-events-none" style={{ animationDelay: '1.5s' }}></div>
+      {/* Interactive Parallax Background Layer */}
+      <div 
+        className="absolute inset-0 z-0 pointer-events-none transition-transform duration-1000 ease-out"
+        style={{
+          transform: `translate(${(mousePos.x - (typeof window !== 'undefined' ? window.innerWidth : 1000) / 2) * 0.08}px, ${(mousePos.y - (typeof window !== 'undefined' ? window.innerHeight : 800) / 2) * 0.08}px)`
+        }}
+      >
+        {/* Animated background orbs covering the whole page */}
+        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-500 rounded-full mix-blend-screen filter blur-[100px] opacity-40 animate-[pulse_5s_ease-in-out_infinite] pointer-events-none"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-teal-400 rounded-full mix-blend-screen filter blur-[120px] opacity-30 animate-[pulse_6s_ease-in-out_infinite] pointer-events-none" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-[30%] right-[10%] w-[400px] h-[400px] bg-cyan-400 rounded-full mix-blend-screen filter blur-[90px] opacity-30 animate-[pulse_7s_ease-in-out_infinite] pointer-events-none" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute bottom-[20%] left-[10%] w-[350px] h-[350px] bg-indigo-500 rounded-full mix-blend-screen filter blur-[100px] opacity-35 animate-[pulse_4s_ease-in-out_infinite] pointer-events-none" style={{ animationDelay: '3s' }}></div>
+        <div className="absolute top-[50%] left-[50%] w-[600px] h-[600px] -translate-x-1/2 -translate-y-1/2 bg-blue-600 rounded-full mix-blend-screen filter blur-[150px] opacity-20 animate-[pulse_8s_ease-in-out_infinite] pointer-events-none" style={{ animationDelay: '1.5s' }}></div>
+
+        {/* Lighthouse Sweeping Beacon Effect */}
+        <div 
+          className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 pointer-events-none animate-[spin_8s_linear_infinite] mix-blend-screen opacity-100 z-0"
+          style={{ width: '250vmax', height: '250vmax' }}
+        >
+          <div className="absolute inset-0 blur-3xl" style={{
+            background: 'conic-gradient(from 0deg at 50% 50%, rgba(14, 165, 233, 0.8) 0deg, transparent 60deg, transparent 120deg, rgba(217, 70, 239, 0.8) 180deg, transparent 240deg, transparent 300deg, rgba(14, 165, 233, 0.8) 360deg)'
+          }}></div>
+        </div>
+      </div>
+
+      {/* Mouse Following Flashlight */}
+      <div 
+        className="absolute pointer-events-none mix-blend-screen z-0 transition-opacity duration-300"
+        style={{
+          width: '800px',
+          height: '800px',
+          left: `${mousePos.x}px`,
+          top: `${mousePos.y}px`,
+          transform: 'translate(-50%, -50%)',
+          background: 'radial-gradient(circle, rgba(56, 189, 248, 0.4) 0%, rgba(192, 38, 211, 0.1) 40%, transparent 70%)',
+        }}
+      ></div>
 
       {/* Centered Login Pane */}
       <div className="w-full flex flex-col justify-center items-center px-4 sm:px-8 relative z-10">
