@@ -18,7 +18,7 @@ export default function RecommendationsView({ onInspect, onApprove }: Recommenda
       ))}
 
       {/* AI info blurb */}
-      <div className="rounded-xl bg-slate-800 p-4 text-xs text-slate-400 leading-relaxed">
+      <div className="rounded-xl bg-slate-800 p-4 text-xs text-slate-500 leading-relaxed">
         <span className="text-white font-semibold block mb-1">How are these ranked?</span>
         Recommendations are prioritised by stockout urgency, travel time, and available buffer stock — sorted highest risk first.
         <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-700 text-[11px]">

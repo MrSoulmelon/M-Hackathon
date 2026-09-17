@@ -5,8 +5,8 @@
 
 body {
   font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
-  background-color: #f8fafc;
-  color: #0f172a;
+  background-color: #020617;
+  color: #f8fafc;
 }
 
 /* Custom scrollbars */
@@ -18,11 +18,11 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #334155;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #475569;
 }
 
 .custom-pill {
@@ -31,8 +31,8 @@ body {
 
 /* Rich, visible background for a modern medical/storage look */
 .bg-medical-theme {
-  background-color: #f8fafc;
-  background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+  background-color: #020617;
+  background-image: radial-gradient(#1e293b 1px, transparent 1px);
   background-size: 32px 32px;
   position: relative;
 }

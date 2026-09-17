@@ -386,7 +386,7 @@ def save_to_csv_and_sqlite(facilities, supplies, inventory, consumption, repleni
     hashed_pwd = pwd_context.hash("password")
     
     # Admin
-    users.append({"id": "USR-001", "email": "admin@shortagewatch.com", "password_hash": hashed_pwd, "role": "admin", "reference_id": "GLOBAL"})
+    users.append({"id": "USR-001", "email": "admin@beacon.com", "password_hash": hashed_pwd, "role": "admin", "reference_id": "GLOBAL"})
     # Consumers (Facility Staff) - one for each facility
     for idx, f in enumerate(facilities):
         users.append({"id": f"USR-F{idx+1:03d}", "email": f"staff@{f['facility_id'].lower()}.com", "password_hash": hashed_pwd, "role": "consumer", "reference_id": f["facility_id"]})

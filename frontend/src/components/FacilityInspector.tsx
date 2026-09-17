@@ -82,34 +82,34 @@ export default function FacilityInspector({ facility, initialMedicineId, onClose
   }, [facility.facility_id, selectedMedicineId, getChartData, currentScore]);
 
   // Risk badge
-  let riskBadgeClass = 'bg-emerald-100 text-emerald-800 border-emerald-200';
+  let riskBadgeClass = 'bg-emerald-900 text-emerald-800 border-emerald-800';
   let riskBadgeText = 'Optimal Buffer Level';
   if (currentScore.risk_level === 'red') {
-    riskBadgeClass = 'bg-rose-100 text-rose-800 border-rose-200';
+    riskBadgeClass = 'bg-rose-900 text-rose-200 border-rose-800';
     riskBadgeText = 'Critical Risk Level';
   } else if (currentScore.risk_level === 'amber') {
-    riskBadgeClass = 'bg-amber-100 text-amber-800 border-amber-200';
+    riskBadgeClass = 'bg-amber-900 text-amber-800 border-amber-800';
     riskBadgeText = 'At-Risk Level';
   }
 
   // Signal: Consumption Trend
   let trendValue = 'Stable Baseline';
-  let trendClass = 'text-sm font-bold text-slate-800 capitalize';
+  let trendClass = 'text-sm font-bold text-slate-200 capitalize';
   let trendDesc = 'Consumption rate conforms with rolling 90-day moving average.';
   let TrendIcon = Activity;
-  let trendIconClass = 'text-slate-400';
+  let trendIconClass = 'text-slate-500';
   if (currentScore.signals.consumption_trend === 'rising') {
     trendValue = 'Surging (+38%)';
-    trendClass = 'text-sm font-bold text-rose-700 capitalize';
+    trendClass = 'text-sm font-bold text-rose-300 capitalize';
     trendDesc = 'Spike in patient prescriptions over trailing 7-day window.';
     TrendIcon = TrendingUp;
     trendIconClass = 'text-rose-500';
   } else if (currentScore.signals.consumption_trend === 'falling') {
     trendValue = 'Decreasing (-12%)';
-    trendClass = 'text-sm font-bold text-slate-700 capitalize';
+    trendClass = 'text-sm font-bold text-slate-300 capitalize';
     trendDesc = 'Dispensing velocity below seasonal baseline.';
     TrendIcon = TrendingDown;
-    trendIconClass = 'text-slate-400';
+    trendIconClass = 'text-slate-500';
   }
 
   // Signal: Replenishment
@@ -120,7 +120,7 @@ export default function FacilityInspector({ facility, initialMedicineId, onClose
   let replIconClass = 'text-emerald-500';
   if (currentScore.signals.replenishment_status === 'overdue') {
     replValue = `Overdue (${currentScore.signals.replenishment_delay_days} days)`;
-    replClass = 'text-sm font-bold text-rose-700 capitalize';
+    replClass = 'text-sm font-bold text-rose-300 capitalize';
     replDesc = `Supplier PO order has breached SLA delivery window by ${currentScore.signals.replenishment_delay_days} days.`;
     replIconClass = 'text-rose-500';
   } else if (currentScore.signals.replenishment_status === 'delayed') {
@@ -136,7 +136,7 @@ export default function FacilityInspector({ facility, initialMedicineId, onClose
   let anomDesc = 'Normal distribution: minimal variance detected.';
   let anomIconClass = 'text-emerald-500';
   if (anom > 0.7) {
-    anomClass = 'text-sm font-bold text-rose-700 font-mono';
+    anomClass = 'text-sm font-bold text-rose-300 font-mono';
     anomDesc = 'High divergence anomaly: exceeds 2.5 standard deviations.';
     anomIconClass = 'text-rose-500';
   } else if (anom > 0.4) {
@@ -155,16 +155,16 @@ export default function FacilityInspector({ facility, initialMedicineId, onClose
       }}
     >
       <div
-        className={`w-full max-w-2xl bg-white h-full shadow-2xl overflow-y-auto transform transition-transform duration-300 flex flex-col border-l border-slate-200 ${visible ? 'translate-x-0' : 'translate-x-full'}`}
+        className={`w-full max-w-2xl bg-slate-900 h-full shadow-2xl overflow-y-auto transform transition-transform duration-300 flex flex-col border-l border-slate-800 ${visible ? 'translate-x-0' : 'translate-x-full'}`}
       >
         {/* Modal Header */}
-        <div className="p-6 border-b border-slate-200 bg-slate-50/50 sticky top-0 z-10 backdrop-blur flex items-start justify-between">
+        <div className="p-6 border-b border-slate-800 bg-slate-950/50 sticky top-0 z-10 backdrop-blur flex items-start justify-between">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-200 text-slate-700">{facility.type}</span>
+              <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-200 text-slate-300">{facility.type}</span>
               <span className="text-xs font-medium text-slate-500">{facility.district} District</span>
             </div>
-            <h2 className="text-xl font-bold text-slate-900 tracking-tight">{facility.name}</h2>
+            <h2 className="text-xl font-bold text-white tracking-tight">{facility.name}</h2>
             <div className="flex items-center gap-4 text-xs text-slate-500 pt-1">
               <span className="flex items-center gap-1">
                 <Users className="w-3.5 h-3.5" />
@@ -172,11 +172,11 @@ export default function FacilityInspector({ facility, initialMedicineId, onClose
               </span>
               <span className="flex items-center gap-1">
                 <Truck className="w-3.5 h-3.5" />
-                Primary Supplier: <span className="font-mono font-medium text-slate-700">{facility.supplier_id}</span>
+                Primary Supplier: <span className="font-mono font-medium text-slate-300">{facility.supplier_id}</span>
               </span>
             </div>
           </div>
-          <button onClick={onClose} className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition">
+          <button onClick={onClose} className="p-1.5 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-slate-200 transition">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -186,8 +186,8 @@ export default function FacilityInspector({ facility, initialMedicineId, onClose
           {/* Medicine Risk Inventory Selector */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-700">Monitored Formulary & Risk Level</h3>
-              <span className="text-xs text-slate-400">Click a medicine to inspect predictive trajectory</span>
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-300">Monitored Formulary & Risk Level</h3>
+              <span className="text-xs text-slate-500">Click a medicine to inspect predictive trajectory</span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {medicines.map((med: Medicine) => {
@@ -201,8 +201,8 @@ export default function FacilityInspector({ facility, initialMedicineId, onClose
                 else if (risk === 'amber') dotColor = 'bg-amber-500';
 
                 const selectedStyle = isSelected
-                  ? 'ring-2 ring-sky-500 bg-sky-50/50 border-sky-300'
-                  : 'bg-white border-slate-200 hover:border-slate-300';
+                  ? 'ring-2 ring-sky-500 bg-slate-900/50 border-sky-700'
+                  : 'bg-slate-900 border-slate-800 hover:border-slate-700';
 
                 return (
                   <button
@@ -211,8 +211,8 @@ export default function FacilityInspector({ facility, initialMedicineId, onClose
                     className={`text-left p-2.5 rounded-lg border transition flex items-center justify-between ${selectedStyle}`}
                   >
                     <div className="truncate mr-2">
-                      <span className="text-xs font-semibold text-slate-800 block truncate">{med.name}</span>
-                      <span className="text-[10px] text-slate-400 capitalize">{med.category}</span>
+                      <span className="text-xs font-semibold text-slate-200 block truncate">{med.name}</span>
+                      <span className="text-[10px] text-slate-500 capitalize">{med.category}</span>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
                       <span className="text-[10px] font-mono text-slate-500">{days}d</span>
@@ -225,24 +225,24 @@ export default function FacilityInspector({ facility, initialMedicineId, onClose
           </div>
 
           {/* Predictive Details for Selected Medicine */}
-          <div className="space-y-6 border-t border-slate-200 pt-6">
+          <div className="space-y-6 border-t border-slate-800 pt-6">
             {/* Selected Medicine Top Summary Card */}
-            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <div className="p-4 rounded-xl bg-slate-950 border border-slate-800">
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="text-xs text-slate-400 uppercase tracking-wider font-semibold">Active Selection</span>
-                  <h4 className="text-base font-bold text-slate-900 mt-0.5">{currentScore.medicine_name}</h4>
+                  <span className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Active Selection</span>
+                  <h4 className="text-base font-bold text-white mt-0.5">{currentScore.medicine_name}</h4>
                   <div className="flex items-center gap-2 mt-1">
                     <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${riskBadgeClass}`}>{riskBadgeText}</span>
                     <span className="text-xs text-slate-500">
-                      Days of Supply: <strong className="font-mono text-slate-800">{currentScore.days_of_supply} days</strong>
+                      Days of Supply: <strong className="font-mono text-slate-200">{currentScore.days_of_supply} days</strong>
                     </span>
                   </div>
                 </div>
 
                 <div className="text-right">
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-white border border-slate-200 shadow-sm cursor-help relative group">
-                    <Gauge className="w-3.5 h-3.5 text-sky-600" />
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-900 border border-slate-800 shadow-sm cursor-help relative group">
+                    <Gauge className="w-3.5 h-3.5 text-sky-400" />
                     <span>
                       Confidence: <strong>{currentScore.confidence.toUpperCase()}</strong>
                     </span>
@@ -251,12 +251,12 @@ export default function FacilityInspector({ facility, initialMedicineId, onClose
                       <span>{currentScore.confidence_note}</span>
                     </div>
                   </div>
-                  <div className="text-[11px] text-slate-400 mt-1">
-                    Est. Stockout: <span className="font-medium text-rose-600 font-mono">~{currentScore.projected_stockout_date} (predicted)</span>
+                  <div className="text-[11px] text-slate-500 mt-1">
+                    Est. Stockout: <span className="font-medium text-rose-400 font-mono">~{currentScore.projected_stockout_date} (predicted)</span>
                   </div>
                   <button 
                     onClick={() => setShowHistory(true)}
-                    className="mt-2 px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs rounded transition"
+                    className="mt-2 px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-300 text-xs rounded transition"
                   >
                     View History
                   </button>
@@ -265,17 +265,17 @@ export default function FacilityInspector({ facility, initialMedicineId, onClose
             </div>
 
             {/* Stock Level Trajectory Chart */}
-            <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-sm space-y-3">
+            <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 shadow-sm space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-800">30-Day Inventory Trajectory & Depletion Curve</h4>
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-200">30-Day Inventory Trajectory & Depletion Curve</h4>
                   <p className="text-xs text-slate-500">Historical consumption vs. projected stockout boundary</p>
                 </div>
                 <div className="flex items-center gap-3 text-xs">
-                  <span className="flex items-center gap-1 text-slate-600">
+                  <span className="flex items-center gap-1 text-slate-500">
                     <span className="w-2.5 h-0.5 bg-sky-500 inline-block" /> Actual
                   </span>
-                  <span className="flex items-center gap-1 text-slate-600">
+                  <span className="flex items-center gap-1 text-slate-500">
                     <span className="w-2.5 h-0.5 border-t-2 border-dashed border-rose-500 inline-block" /> Projected
                   </span>
                   <span className="flex items-center gap-1 text-slate-500">
@@ -284,9 +284,9 @@ export default function FacilityInspector({ facility, initialMedicineId, onClose
                 </div>
               </div>
 
-              <div className="w-full h-44 relative bg-slate-50/50 rounded-lg p-2 border border-slate-100">
+              <div className="w-full h-44 relative bg-slate-950/50 rounded-lg p-2 border border-slate-800">
                 {chartLoading ? (
-                  <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-50/80 backdrop-blur-sm rounded-lg">
+                  <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm rounded-lg">
                     <div className="w-6 h-6 border-2 border-sky-500 border-t-transparent rounded-full animate-spin"></div>
                   </div>
                 ) : null}
@@ -344,13 +344,13 @@ export default function FacilityInspector({ facility, initialMedicineId, onClose
                 </ResponsiveContainer>
               </div>
 
-              <div className="flex justify-between text-[10px] text-slate-400 px-4 mt-1 font-mono">
+              <div className="flex justify-between text-[10px] text-slate-500 px-4 mt-1 font-mono">
                 <span>-20d</span>
                 <span>-15d</span>
                 <span>-10d</span>
                 <span>-5d</span>
-                <span className="font-bold text-slate-700">Today</span>
-                <span className="text-rose-600 font-bold">+5d</span>
+                <span className="font-bold text-slate-300">Today</span>
+                <span className="text-rose-400 font-bold">+5d</span>
                 <span>+10d</span>
               </div>
             </div>
@@ -358,16 +358,16 @@ export default function FacilityInspector({ facility, initialMedicineId, onClose
             {/* "Why This Is Flagged" Multi-Signal Section */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
-                  <Binary className="w-3.5 h-3.5 text-sky-600" />
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-200 flex items-center gap-1.5">
+                  <Binary className="w-3.5 h-3.5 text-sky-400" />
                   Transparent Signal Attribution ("Why This Is Flagged")
                 </h4>
-                <span className="text-[11px] text-slate-400 font-medium">Deconstructed Indicators</span>
+                <span className="text-[11px] text-slate-500 font-medium">Deconstructed Indicators</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {/* Signal 1: Consumption Trend */}
-                <div className="p-3 rounded-lg border border-slate-200 bg-white shadow-xs">
+                <div className="p-3 rounded-lg border border-slate-800 bg-slate-900 shadow-xs">
                   <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
                     <span>Consumption Trend</span>
                     <TrendIcon className={`w-4 h-4 ${trendIconClass}`} />
@@ -379,7 +379,7 @@ export default function FacilityInspector({ facility, initialMedicineId, onClose
                 </div>
 
                 {/* Signal 2: Replenishment Status */}
-                <div className="p-3 rounded-lg border border-slate-200 bg-white shadow-xs">
+                <div className="p-3 rounded-lg border border-slate-800 bg-slate-900 shadow-xs">
                   <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
                     <span>Replenishment</span>
                     <ReplIcon className={`w-4 h-4 ${replIconClass}`} />
@@ -391,7 +391,7 @@ export default function FacilityInspector({ facility, initialMedicineId, onClose
                 </div>
 
                 {/* Signal 3: Anomaly Score */}
-                <div className="p-3 rounded-lg border border-slate-200 bg-white shadow-xs">
+                <div className="p-3 rounded-lg border border-slate-800 bg-slate-900 shadow-xs">
                   <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
                     <span>Anomaly Score</span>
                     <Activity className={`w-4 h-4 ${anomIconClass}`} />
@@ -404,11 +404,11 @@ export default function FacilityInspector({ facility, initialMedicineId, onClose
               </div>
 
               {/* Reason Codes */}
-              <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
+              <div className="p-3 bg-slate-950 rounded-lg border border-slate-800">
                 <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wider block mb-1.5">Machine Reason Codes</span>
                 <div className="flex flex-wrap gap-1.5">
                   {currentScore.reason_codes.map((code) => (
-                    <span key={code} className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-white text-slate-700 border border-slate-200">
+                    <span key={code} className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-slate-900 text-slate-300 border border-slate-800">
                       {code}
                     </span>
                   ))}
@@ -417,10 +417,10 @@ export default function FacilityInspector({ facility, initialMedicineId, onClose
             </div>
 
             {/* Direct Triage Action */}
-            <div className="p-4 rounded-xl bg-sky-50/70 border border-sky-200/80 flex items-center justify-between">
+            <div className="p-4 rounded-xl bg-slate-900/70 border border-sky-800/80 flex items-center justify-between">
               <div className="space-y-0.5">
                 <h5 className="text-xs font-semibold text-sky-900">Recommended Next Step</h5>
-                <p className="text-xs text-sky-800">Dispatch 450 units from Central Warehouse via priority van.</p>
+                <p className="text-xs text-sky-300">Dispatch 450 units from Central Warehouse via priority van.</p>
               </div>
               <button
                 onClick={onDispatch}
@@ -434,11 +434,11 @@ export default function FacilityInspector({ facility, initialMedicineId, onClose
         </div>
 
         {/* Modal Footer */}
-        <div className="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-xs text-slate-500">
+        <div className="p-4 border-t border-slate-800 bg-slate-950 flex items-center justify-between text-xs text-slate-500">
           <span>
-            Facility ID: <span className="font-mono text-slate-700">{facility.facility_id}</span>
+            Facility ID: <span className="font-mono text-slate-300">{facility.facility_id}</span>
           </span>
-          <button onClick={onClose} className="px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-white text-slate-700 font-medium transition">
+          <button onClick={onClose} className="px-3 py-1.5 rounded-lg border border-slate-700 hover:bg-slate-900 text-slate-300 font-medium transition">
             Close Inspector
           </button>
         </div>

@@ -31,7 +31,7 @@ export const Register: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full p-6 bg-white rounded-lg shadow-md">
+      <div className="max-w-md w-full p-6 bg-slate-900 rounded-lg shadow-md">
         <h2 className="text-2xl font-bold mb-6 text-center">Register</h2>
         {error && <div className="mb-4 text-red-500 text-sm text-center">{error}</div>}
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -86,7 +86,7 @@ export const Register: React.FC = () => {
           </button>
         </form>
         <div className="mt-4 text-center text-sm text-gray-600">
-          Already have an account? <a href="/login" className="text-blue-600 hover:underline">Login</a>
+          Already have an account? <a href="/login" className="text-blue-400 hover:underline">Login</a>
         </div>
       </div>
     </div>

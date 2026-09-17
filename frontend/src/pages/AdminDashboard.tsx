@@ -109,7 +109,7 @@ export function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-500 flex-col gap-4">
+      <div className="min-h-screen flex items-center justify-center bg-slate-950 text-slate-500 flex-col gap-4">
         <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
         <p className="text-sm font-medium">Loading AI Models & Inventory Data...</p>
       </div>
@@ -120,11 +120,11 @@ export function AdminDashboard() {
   const topAlerts = alerts.slice(0, 3);
 
   return (
-    <div className="min-h-screen flex flex-col font-sans overflow-hidden bg-medical-theme text-slate-900">
+    <div className="min-h-screen flex flex-col font-sans overflow-hidden bg-medical-theme text-white">
       
       {/* Background Orbs (More visible) */}
-      <div className="fixed top-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-40 pointer-events-none z-0"></div>
-      <div className="fixed bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-teal-400 rounded-full mix-blend-multiply filter blur-[128px] opacity-40 pointer-events-none z-0"></div>
+      <div className="fixed top-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-500 rounded-full mix-blend-screen filter blur-[128px] opacity-40 pointer-events-none z-0"></div>
+      <div className="fixed bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-teal-400 rounded-full mix-blend-screen filter blur-[128px] opacity-40 pointer-events-none z-0"></div>
 
       <div className="relative z-10 flex flex-col flex-1">
         <Header
@@ -143,9 +143,9 @@ export function AdminDashboard() {
       <main className="flex-1 max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
         {/* User info row */}
-        <div className="flex justify-between items-center text-xs text-slate-400">
-          <span>Signed in as <span className="font-semibold text-slate-600">{user?.email}</span></span>
-          <button onClick={logout} className="text-slate-400 hover:text-slate-700 underline transition">Sign out</button>
+        <div className="flex justify-between items-center text-xs text-slate-500">
+          <span>Signed in as <span className="font-semibold text-slate-500">{user?.email}</span></span>
+          <button onClick={logout} className="text-slate-500 hover:text-slate-300 underline transition">Sign out</button>
         </div>
 
         {/* Summary stats */}
@@ -164,7 +164,7 @@ export function AdminDashboard() {
             <div className="flex items-center justify-between">
               <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-widest">
                 Facilities
-                <span className="ml-2 font-mono bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded text-[10px]">
+                <span className="ml-2 font-mono bg-slate-200 text-slate-500 px-1.5 py-0.5 rounded text-[10px]">
                   {filteredFacilities.length}
                 </span>
               </h2>
@@ -176,10 +176,10 @@ export function AdminDashboard() {
             </div>
 
             {filteredFacilities.length === 0 ? (
-              <div className="p-12 text-center bg-white rounded-2xl border border-dashed border-slate-300 shadow-sm">
+              <div className="p-12 text-center bg-slate-900 rounded-2xl border border-dashed border-slate-700 shadow-sm">
                 <SearchX className="w-8 h-8 mx-auto text-slate-300 mb-3" />
-                <h3 className="text-sm font-medium text-slate-700">No facilities match these filters</h3>
-                <p className="text-xs text-slate-400 mt-1">Adjust the filters in the header to see results.</p>
+                <h3 className="text-sm font-medium text-slate-300">No facilities match these filters</h3>
+                <p className="text-xs text-slate-500 mt-1">Adjust the filters in the header to see results.</p>
                 <button
                   onClick={resetFilters}
                   className="mt-4 text-xs px-3 py-1.5 rounded-lg bg-slate-900 text-white font-medium hover:bg-slate-800 transition"
@@ -209,7 +209,7 @@ export function AdminDashboard() {
               <section className="space-y-3">
                 <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-widest flex items-center justify-between">
                   <span>Priority Alerts</span>
-                  <span className="text-rose-500 font-bold bg-rose-50 px-1.5 py-0.5 rounded text-[10px]">{alerts.length} Active</span>
+                  <span className="text-rose-500 font-bold bg-rose-950 px-1.5 py-0.5 rounded text-[10px]">{alerts.length} Active</span>
                 </h2>
                 
                 <div className="space-y-3">

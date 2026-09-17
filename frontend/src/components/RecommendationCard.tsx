@@ -13,17 +13,17 @@ export default function RecommendationCard({ rec, onInspect, onApprove }: Recomm
   const { getFacility, approveRecommendation } = useApi();
   const [loading, setLoading] = useState(false);
 
-  let tagBg = 'bg-sky-50 text-sky-700';
+  let tagBg = 'bg-slate-900 text-sky-400';
   let tagLabel = 'Redistribute';
   let TagIcon = ArrowRightLeft;
 
   if (rec.type === 'expedite') {
     TagIcon = Clock;
-    tagBg = 'bg-amber-50 text-amber-700';
+    tagBg = 'bg-amber-950 text-amber-700';
     tagLabel = 'Expedite Order';
   } else if (rec.type === 'escalate') {
     TagIcon = Flag;
-    tagBg = 'bg-rose-50 text-rose-700';
+    tagBg = 'bg-rose-950 text-rose-300';
     tagLabel = 'Escalate';
   }
 
@@ -39,7 +39,7 @@ export default function RecommendationCard({ rec, onInspect, onApprove }: Recomm
   };
 
   return (
-    <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+    <div className="bg-slate-900 rounded-2xl p-4 border border-slate-800 shadow-sm hover:shadow-md transition-shadow">
       {/* Header bar (Criticality / Urgency) */}
       <div className="flex items-center justify-between gap-2 mb-2">
         <span className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full ${tagBg}`}>
@@ -51,7 +51,7 @@ export default function RecommendationCard({ rec, onInspect, onApprove }: Recomm
           className="flex items-center gap-1.5 cursor-help"
           title={`Urgency score: ${rec.priority_score}/100. Higher = closer to stockout.`}
         >
-          <div className="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+          <div className="w-16 h-1.5 bg-slate-800 rounded-full overflow-hidden">
             <div
               className={`h-full rounded-full ${rec.priority_score > 90 ? 'bg-rose-500' : 'bg-sky-400'}`}
               style={{ width: `${rec.priority_score}%` }}
@@ -62,16 +62,16 @@ export default function RecommendationCard({ rec, onInspect, onApprove }: Recomm
       </div>
 
       {/* Medicine + reason */}
-      <p className="text-sm font-semibold text-slate-900">{rec.medicine_name}</p>
+      <p className="text-sm font-semibold text-white">{rec.medicine_name}</p>
       <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{rec.priority_reason}</p>
 
       {/* Transfer details */}
       {rec.type === 'redistribution' && (
-        <div className="mt-3 flex items-center justify-between px-3 py-2 bg-slate-50 rounded-lg border border-slate-100 text-xs">
-          <span className="font-medium text-slate-800">
+        <div className="mt-3 flex items-center justify-between px-3 py-2 bg-slate-950 rounded-lg border border-slate-800 text-xs">
+          <span className="font-medium text-slate-200">
             {rec.suggested_quantity} units · {fromFac} → {toFac}
           </span>
-          <span className="flex items-center gap-1 text-slate-400">
+          <span className="flex items-center gap-1 text-slate-500">
             <Navigation className="w-3 h-3" />
             {rec.travel_time_minutes}m
           </span>
@@ -79,10 +79,10 @@ export default function RecommendationCard({ rec, onInspect, onApprove }: Recomm
       )}
 
       {/* Actions */}
-      <div className="mt-3 pt-3 flex items-center justify-between border-t border-slate-100">
+      <div className="mt-3 pt-3 flex items-center justify-between border-t border-slate-800">
         <button
           onClick={(e) => { e.stopPropagation(); onInspect(rec.to_facility_id, rec.medicine_id); }}
-          className="text-xs font-medium text-slate-500 hover:text-slate-800 border border-slate-200 hover:border-slate-300 px-3 py-1.5 rounded-lg transition"
+          className="text-xs font-medium text-slate-500 hover:text-slate-200 border border-slate-800 hover:border-slate-700 px-3 py-1.5 rounded-lg transition"
         >
           View Facility
         </button>

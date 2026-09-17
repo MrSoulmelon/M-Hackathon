@@ -21,15 +21,15 @@ export default function Toast({ title, body, visible }: ToastProps) {
     <div
       role="alert"
       aria-live="polite"
-      className={`fixed bottom-6 right-6 z-[9999] flex items-start gap-3 w-80 bg-white border border-slate-200 rounded-xl shadow-xl px-4 py-3.5 transform transition-all duration-300 ${
+      className={`fixed bottom-6 right-6 z-[9999] flex items-start gap-3 w-80 bg-slate-900 border border-slate-800 rounded-xl shadow-xl px-4 py-3.5 transform transition-all duration-300 ${
         show ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0 pointer-events-none'
       }`}
     >
-      <div className="p-1.5 rounded-lg bg-emerald-100 text-emerald-600 shrink-0 mt-0.5">
+      <div className="p-1.5 rounded-lg bg-emerald-900 text-emerald-600 shrink-0 mt-0.5">
         <CheckCircle2 className="w-4 h-4" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-slate-800">{title}</p>
+        <p className="text-sm font-semibold text-slate-200">{title}</p>
         {body && <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{body}</p>}
       </div>
       <button
